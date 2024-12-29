@@ -5,8 +5,11 @@ import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Menu from './pages/Menu';
 import Table from './pages/Table';
+import TableScan from './pages/TableScan';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
+import Payment from './pages/Payment';
+import Receipt from './pages/Receipt';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -22,9 +25,12 @@ function App() {
         }>
           <Route index element={<Home />} />
           <Route path="menu" element={<Menu />} />
+          <Route path="table/scan" element={<TableScan />} />
           <Route path="table/:tableId" element={<Table />} />
           <Route path="profile" element={<Profile />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="payment" element={<Payment />} />
+          <Route path="receipt" element={<Receipt />} />
         </Route>
       </Routes>
     </div>

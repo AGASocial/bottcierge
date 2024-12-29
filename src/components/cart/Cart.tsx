@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import {
   removeFromCart,
   updateItemQuantity,
   clearCart,
 } from '../../store/slices/orderSlice';
 import type { OrderItem } from '../../types';
-import PaymentModal from '../payment/PaymentModal';
 
 interface CartProps {
   isOpen: boolean;
@@ -133,13 +132,6 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               )}
             </div>
           </motion.div>
-
-          {/* Payment Modal */}
-          <PaymentModal
-            isOpen={showPayment}
-            onClose={() => setShowPayment(false)}
-            total={total}
-          />
         </motion.div>
       )}
     </AnimatePresence>

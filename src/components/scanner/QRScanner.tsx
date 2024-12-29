@@ -9,9 +9,10 @@ import type { AppDispatch } from '../../store';
 interface QRScannerProps {
   isOpen: boolean;
   onClose: () => void;
+  onScan: (tableId: string) => void;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose }) => {
+const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
   const [controls, setControls] = useState<IScannerControls | null>(null);
@@ -39,8 +40,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose }) => {
             if (!mounted) return;
             if (result) {
               const tableId = result.getText();
-              await dispatch(getTableById(tableId));
-              dispatch(setQRScanning(false));
+              onScan(tableId);
               onClose();
             }
           }
@@ -60,7 +60,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose }) => {
       mounted = false;
       controls?.stop();
     };
-  }, [dispatch, isOpen, onClose]);
+  }, [dispatch, isOpen, onClose, onScan]);
 
   return (
     <AnimatePresence>
@@ -75,26 +75,28 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose }) => {
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
-            className="bg-white rounded-lg p-4 max-w-lg w-full"
+            className="bg-purple-800 rounded-lg p-4 max-w-lg w-full text-white"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Scan QR Code</h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="text-purple-200 hover:text-white focus:outline-none"
               >
-                <XMarkIcon className="w-6 h-6" />
+                <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
 
-            {error ? (
-              <div className="text-red-500 text-center p-4">{error}</div>
-            ) : (
-              <div className="relative aspect-square">
-                <video
-                  id="video"
-                  className="w-full h-full object-cover rounded"
-                />
+            <div className="relative aspect-square w-full bg-purple-900 rounded-lg overflow-hidden mb-4">
+              <video
+                id="video"
+                className="absolute inset-0 w-full h-full object-cover"
+              ></video>
+            </div>
+
+            {error && (
+              <div className="text-red-300 text-sm text-center">
+                {error}
               </div>
             )}
           </motion.div>

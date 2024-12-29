@@ -47,6 +47,45 @@ const initialState: VenueState = {
   },
 };
 
+const venueNames = [
+  "The Purple Lounge",
+  "Bottcierge Bar & Grill",
+  "Skyline Social",
+  "The Rustic Barrel",
+  "Urban Spirits",
+  "The Crafty Tap",
+  "Moonlight Tavern",
+  "The Social House",
+  "Coastal Kitchen",
+  "The Local Spot"
+];
+
+const generateRandomVenue = (tableId: string): Venue => {
+  const randomName = venueNames[Math.floor(Math.random() * venueNames.length)];
+  return {
+    id: `venue_${Math.random().toString(36).substr(2, 9)}`,
+    name: randomName,
+    address: "123 Main Street",
+    description: "A cozy spot for food and drinks",
+    tables: [{
+      id: tableId,
+      number: tableId,
+      status: 'available',
+      capacity: 4,
+      x: 0,
+      y: 0
+    }]
+  };
+};
+
+export const setRandomVenue = createAsyncThunk(
+  'venue/setRandomVenue',
+  async (tableId: string) => {
+    const venue = generateRandomVenue(tableId);
+    return venue;
+  }
+);
+
 export const fetchVenueDetails = createAsyncThunk(
   'venue/fetchDetails',
   async (venueId: string, { rejectWithValue }) => {
@@ -169,6 +208,9 @@ const venueSlice = createSlice({
         if (ruleIndex !== -1) {
           state.pricingRules[ruleIndex] = action.payload;
         }
+      })
+      .addCase(setRandomVenue.fulfilled, (state, action) => {
+        state.currentVenue = action.payload;
       });
   },
 });

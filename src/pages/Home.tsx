@@ -17,10 +17,10 @@ const Home: React.FC = () => {
         >
           <div className="flex items-center space-x-4 mb-4">
             <QrCodeIcon className="w-8 h-8 text-electric-blue" />
-            <h2 className="text-xl font-bold">Scan Table QR</h2>
+            <h2 className="text-xl font-bold">Start a new Order</h2>
           </div>
           <p className="text-gray-300">
-            Scan your table's QR code to start ordering drinks
+            To start a new order, please enter or scan your table's QR code
           </p>
         </div>
 

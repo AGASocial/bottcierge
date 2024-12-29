@@ -12,6 +12,7 @@ import { createOrder } from '../store/slices/orderSlice';
 import QRScanner from '../components/scanner/QRScanner';
 import Cart from '../components/cart/Cart';
 import type { AppDispatch, RootState } from '../store';
+import { useNavigate } from 'react-router-dom';
 
 const Table: React.FC = () => {
   const { tableId } = useParams<{ tableId: string }>();
@@ -21,6 +22,7 @@ const Table: React.FC = () => {
   );
   const { currentVenue } = useSelector((state: RootState) => state.venue);
   const { cart } = useSelector((state: RootState) => state.order);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (tableId) {
@@ -28,7 +30,7 @@ const Table: React.FC = () => {
     }
   }, [dispatch, tableId]);
 
-  const handleStartOrder = async () => {
+  const handleStartOrder = async () => {    
     if (!currentTable || !currentVenue) return;
 
     await dispatch(createOrder({
@@ -36,21 +38,23 @@ const Table: React.FC = () => {
       tableId: currentTable.id,
       type: 'regular'
     }));
+    
+    navigate('/menu');
   };
 
   const renderTableStatus = (table: typeof currentTable) => {
     if (!table) return null;
 
     const colors = {
-      available: 'bg-green-500',
-      occupied: 'bg-red-500',
-      reserved: 'bg-yellow-500',
+      available: 'bg-green-400',
+      occupied: 'bg-red-400',
+      reserved: 'bg-yellow-400',
     };
 
     return (
       <span
-        className={`px-2 py-1 rounded-full text-white text-sm ${
-          colors[table.status as keyof typeof colors]
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          colors[table.status]
         }`}
       >
         {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
@@ -63,68 +67,58 @@ const Table: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Table Information */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold mb-2">
-                    Table {currentTable.number}
-                  </h1>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-gray-500">
-                      {renderTableStatus(currentTable)}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => dispatch(setQRScanning(true))}
-                  className="p-2 bg-purple-100 rounded-full hover:bg-purple-200"
-                >
-                  <QrCodeIcon className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Capacity */}
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-center space-x-2 text-gray-500 mb-2">
-                  <UsersIcon className="w-5 h-5" />
-                  <span>Capacity</span>
-                </div>
-                <p className="text-2xl font-bold">
-                  {currentTable.capacity}
-                </p>
-              </div>
-
-              {/* Cart */}
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-center space-x-2 text-gray-500 mb-2">
-                  <ShoppingCartIcon className="w-5 h-5" />
-                  <span>Cart</span>
-                </div>
-                <p className="text-2xl font-bold">{cart.length} items</p>
-              </div>
-            </div>
-
-            {currentTable.status === 'available' && (
-              <button
-                onClick={handleStartOrder}
-                className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-              >
-                Start Order
-              </button>
-            )}
+    <div className="container mx-auto px-4 py-8 text-white">
+      <div className="bg-purple-800 rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Table {currentTable?.number}</h1>
+            {renderTableStatus(currentTable)}
           </div>
-
-          {/* Cart Component */}
-          <div className="relative h-full">
-            <Cart />
+          <div className="flex space-x-4">
+            <button
+              onClick={() => dispatch(setQRScanning(true))}
+              className="inline-flex items-center px-4 py-2 border border-purple-500 rounded-md shadow-sm text-sm font-medium text-white bg-purple-700 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              <QrCodeIcon className="h-5 w-5 mr-2" />
+              Scan QR
+            </button>
+            <button
+              onClick={() => navigate('/cart')}
+              className="inline-flex items-center px-4 py-2 border border-purple-500 rounded-md shadow-sm text-sm font-medium text-white bg-purple-700 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              <ShoppingCartIcon className="h-5 w-5 mr-2" />
+              View Cart
+              {cart.length > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-purple-500 rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </button>
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-purple-700 p-4 rounded-lg">
+            <div className="flex items-center mb-4">
+              <UsersIcon className="h-6 w-6 mr-2 text-purple-200" />
+              <h2 className="text-lg font-semibold">Table Information</h2>
+            </div>
+            <div className="space-y-2 text-purple-100">
+              <p>Capacity: {currentTable?.capacity} people</p>
+              {currentTable?.status && (
+                <p>Status: {currentTable.status.charAt(0).toUpperCase() + currentTable.status.slice(1)}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={handleStartOrder}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          >
+            Start Order
+          </button>
         </div>
       </div>
 
@@ -134,10 +128,14 @@ const Table: React.FC = () => {
           <QRScanner
             isOpen={qrScanning}
             onClose={() => dispatch(setQRScanning(false))}
+            onScan={async (tableId) => {
+              await dispatch(getTableById(tableId));
+              dispatch(setQRScanning(false));
+            }}
           />
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 
