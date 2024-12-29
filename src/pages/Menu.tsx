@@ -1,172 +1,215 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MagnifyingGlassIcon, ShoppingBagIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 import type { AppDispatch, RootState } from '../store';
-import {
-  getProducts,
-  setSelectedProduct,
-} from '../store/slices/menuSlice';
-import { addItemToOrder } from '../store/slices/orderSlice';
-import type { Product } from '../types';
+import { getProducts, setSelectedProduct } from '../store/slices/menuSlice';
+import { addItemToOrder, removeFromCart } from '../store/slices/orderSlice';
+import type { Product, OrderItem } from '../types';
+
+const categories = [
+  { id: 'starters', name: 'Starters' },
+  { id: 'mains', name: 'Main Courses' },
+  { id: 'drinks', name: 'Drinks' },
+  { id: 'desserts', name: 'Desserts' },
+  { id: 'sides', name: 'Sides' },
+];
 
 const Menu: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { venueId } = useParams<{ venueId: string }>();
-  const {
-    products,
-    loading,
-    selectedProduct,
-    error,
-  } = useSelector((state: RootState) => state.menu);
-
+  const { products, loading } = useSelector((state: RootState) => state.menu);
+  const { currentVenue } = useSelector((state: RootState) => state.venue);
+  const { cart } = useSelector((state: RootState) => state.order);
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [activeCategory, setActiveCategory] = useState('starters');
+  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
-    if (venueId) {
-      dispatch(getProducts());
-    }
-  }, [dispatch, venueId]);
+    dispatch(getProducts());
+  }, [dispatch]);
 
   const handleAddToCart = (product: Product) => {
-    if (product.id) {
-      dispatch(addItemToOrder({
-        orderId: 'current',
-        item: {
-          productId: product.id,
-          name: product.name,
-          quantity: 1,
-          price: product.price,
-          status: 'pending',
-        },
-      }));
-    }
+    dispatch(addItemToOrder({
+      orderId: 'current',
+      item: {
+        productId: product.id,
+        name: product.name,
+        quantity: 1,
+        price: product.price,
+        status: 'pending'
+      }
+    }));
   };
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || product.category === selectedCategory;
-    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-    return matchesSearch && matchesCategory && matchesPrice;
-  });
+  const handleRemoveFromCart = (itemId: string) => {
+    dispatch(removeFromCart(itemId));
+  };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const getItemQuantityInCart = (productId: string) => {
+    return cart.reduce((count, item) => (
+      item.productId === productId ? count + item.quantity : count
+    ), 0);
+  };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const scrollToCategory = (categoryId: string) => {
+    categoryRefs.current[categoryId]?.scrollIntoView({ behavior: 'smooth' });
+    setActiveCategory(categoryId);
+  };
+
+  const renderQuantityControls = (product: Product) => {
+    const quantity = getItemQuantityInCart(product.id);
+    const cartItem = cart.find(item => item.productId === product.id);
+    
+    return quantity > 0 ? (
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={() => cartItem && handleRemoveFromCart(cartItem.id)}
+          className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+        >
+          <MinusIcon className="h-4 w-4" />
+        </button>
+        <span className="text-purple-900 font-medium">{quantity}</span>
+        <button
+          onClick={() => handleAddToCart(product)}
+          className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+        >
+          <PlusIcon className="h-4 w-4" />
+        </button>
+      </div>
+    ) : (
+      <button
+        onClick={() => handleAddToCart(product)}
+        className="px-3 py-1 rounded-full bg-purple-600 text-white text-sm hover:bg-purple-700"
+      >
+        Add
+      </button>
+    );
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Search and Filters */}
-      <div className="mb-8">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full p-2 border rounded"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">Price Range</h3>
-          <div className="flex gap-4">
-            <input
-              type="number"
-              value={priceRange[0]}
-              onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-              className="w-24 p-2 border rounded"
-            />
-            <span className="self-center">to</span>
-            <input
-              type="number"
-              value={priceRange[1]}
-              onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-              className="w-24 p-2 border rounded"
-            />
+    <div className="min-h-screen bg-purple-900">
+      {/* Header */}
+      <div className="bg-purple-800 sticky top-0 z-10 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-white">
+                {currentVenue?.name || 'Menu'}
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search menu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64 pl-10 pr-4 py-2 rounded-full bg-purple-700 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <MagnifyingGlassIcon className="h-5 w-5 text-purple-300 absolute left-3 top-2.5" />
+              </div>
+              <div className="relative">
+                <ShoppingBagIcon className="h-6 w-6 text-white" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cart.reduce((total, item) => total + item.quantity, 0)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Navigation */}
+        <div className="border-t border-purple-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex space-x-8 overflow-x-auto py-3 scrollbar-hide">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => scrollToCategory(category.id)}
+                  className={`text-sm font-medium whitespace-nowrap ${
+                    activeCategory === category.id
+                      ? 'text-white'
+                      : 'text-purple-300 hover:text-white'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <motion.div
-            key={product.id}
-            layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="bg-white rounded-lg shadow-md overflow-hidden"
-          >
-            {product.image && (
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-48 object-cover"
-              />
-            )}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p className="text-gray-600">{product.description}</p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="text-lg font-bold">${product.price}</span>
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  disabled={product.status === 'out_of_stock'}
-                >
-                  {product.status === 'out_of_stock' ? 'Out of Stock' : 'Add to Cart'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {/* Menu Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {categories.map((category) => {
+              const categoryProducts = products.filter(
+                p => p.category === category.id && 
+                (searchTerm === '' || p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              );
+              
+              if (categoryProducts.length === 0) return null;
 
-      {/* Product Details Modal */}
-      <AnimatePresence>
-        {selectedProduct && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="bg-white rounded-lg p-6 max-w-lg w-full"
-            >
-              <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
-              <p className="text-gray-600 mb-4">{selectedProduct.description}</p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => dispatch(setSelectedProduct(null))}
-                  className="px-4 py-2 border rounded"
+              return (
+                <div
+                  key={category.id}
+                  ref={el => categoryRefs.current[category.id] = el}
+                  className="space-y-6"
                 >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    handleAddToCart(selectedProduct);
-                    dispatch(setSelectedProduct(null));
-                  }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
-                  disabled={selectedProduct.status === 'out_of_stock'}
-                >
-                  {selectedProduct.status === 'out_of_stock' ? 'Out of Stock' : 'Add to Cart'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+                  <h2 className="text-xl font-bold text-white">{category.name}</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {categoryProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        className="bg-purple-800 rounded-lg shadow-lg overflow-hidden"
+                      >
+                        {product.image && (
+                          <div className="aspect-w-16 aspect-h-9">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-48 object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="text-lg font-medium text-white">
+                                {product.name}
+                              </h3>
+                              <p className="text-sm text-purple-300 mt-1">
+                                {product.description}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end space-y-2">
+                              <span className="text-white font-medium">
+                                ${product.price.toFixed(2)}
+                              </span>
+                              {renderQuantityControls(product)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 };
