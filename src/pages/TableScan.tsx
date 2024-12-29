@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { QrCodeIcon } from '@heroicons/react/24/outline';
-import { getTableById } from '../store/slices/tableSlice';
+import { getTableById, setTableCode } from '../store/slices/tableSlice';
 import { setRandomVenue } from '../store/slices/venueSlice';
 import QRScanner from '../components/scanner/QRScanner';
 import type { AppDispatch } from '../store';
@@ -10,7 +10,7 @@ import type { AppDispatch } from '../store';
 const TableScan: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [tableCode, setTableCode] = useState('');
+  const [tableCode, setTableCodeState] = useState('');
   const [partySize, setPartySize] = useState(2);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +21,8 @@ const TableScan: React.FC = () => {
         setError('Please enter a table code');
         return;
       }
+
+      dispatch(setTableCode(tableCode));
       await dispatch(setRandomVenue(tableCode));
       await dispatch(getTableById(tableCode));
       navigate(`/table/${tableCode}`);
@@ -31,6 +33,7 @@ const TableScan: React.FC = () => {
 
   const handleQRCodeScanned = async (code: string) => {
     try {
+      dispatch(setTableCode(code));
       await dispatch(setRandomVenue(code));
       await dispatch(getTableById(code));
       setQrScannerOpen(false);
@@ -44,7 +47,7 @@ const TableScan: React.FC = () => {
     <div className="min-h-screen bg-purple-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto bg-purple-800 rounded-lg shadow-lg p-6 text-white">
         <h1 className="text-2xl font-bold text-center mb-8">Welcome to Bottcierge</h1>
-        
+
         <div className="space-y-6">
           {/* Table Code Input */}
           <div>
@@ -56,7 +59,7 @@ const TableScan: React.FC = () => {
                 type="text"
                 id="tableCode"
                 value={tableCode}
-                onChange={(e) => setTableCode(e.target.value)}
+                onChange={(e) => setTableCodeState(e.target.value)}
                 className="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-purple-600 rounded-md bg-purple-700 text-white placeholder-purple-300"
                 placeholder="Enter table code"
               />

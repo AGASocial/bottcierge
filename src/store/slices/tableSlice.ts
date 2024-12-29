@@ -1,9 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import type { Table } from '../../types';
 
 interface TableState {
   tables: Table[];
   selectedTable: Table | null;
+  currentTableCode: string | null;
   loading: boolean;
   error: string | null;
   qrScanning: boolean;
@@ -12,6 +13,7 @@ interface TableState {
 const initialState: TableState = {
   tables: [],
   selectedTable: null,
+  currentTableCode: null,
   loading: false,
   error: null,
   qrScanning: false,
@@ -64,11 +66,14 @@ const tableSlice = createSlice({
   name: 'table',
   initialState,
   reducers: {
-    selectTable: (state, action) => {
+    selectTable: (state, action: PayloadAction<Table | null>) => {
       state.selectedTable = action.payload;
     },
-    setQRScanning: (state, action) => {
+    setQRScanning: (state, action: PayloadAction<boolean>) => {
       state.qrScanning = action.payload;
+    },
+    setTableCode: (state, action: PayloadAction<string>) => {
+      state.currentTableCode = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -92,6 +97,7 @@ const tableSlice = createSlice({
       .addCase(getTableById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedTable = action.payload;
+        state.currentTableCode = action.payload.number;
       })
       .addCase(getTableById.rejected, (state, action) => {
         state.loading = false;
@@ -100,5 +106,5 @@ const tableSlice = createSlice({
   },
 });
 
-export const { selectTable, setQRScanning } = tableSlice.actions;
+export const { selectTable, setQRScanning, setTableCode } = tableSlice.actions;
 export default tableSlice.reducer;

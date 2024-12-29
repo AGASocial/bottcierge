@@ -1,9 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { QrCodeIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import type { RootState } from '../store';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const currentTableCode = useSelector((state: RootState) => state.table.currentTableCode);
+
+  const handleStartOrder = () => {
+    if (currentTableCode) {
+      navigate(`/table/${currentTableCode}`);
+    } else {
+      navigate('/table/scan');
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -12,7 +23,7 @@ const Home: React.FC = () => {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Scan QR Code */}
         <div
-          onClick={() => navigate('/table/scan')}
+          onClick={handleStartOrder}
           className="glass-card p-6 cursor-pointer hover:bg-white/20 transition-all duration-300"
         >
           <div className="flex items-center space-x-4 mb-4">
@@ -20,7 +31,10 @@ const Home: React.FC = () => {
             <h2 className="text-xl font-bold">Start a new Order</h2>
           </div>
           <p className="text-gray-300">
-            To start a new order, please enter or scan your table's QR code
+            {currentTableCode 
+              ? "Continue ordering for your current table"
+              : "To start a new order, please enter or scan your table's QR code"
+            }
           </p>
         </div>
 
