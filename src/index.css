@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-deep-purple text-white;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-glass rounded-xl border border-white/20;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-electric-blue hover:bg-electric-blue/90 rounded-lg 
+           transition-all duration-300 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-neon-pink hover:bg-neon-pink/90 rounded-lg 
+           transition-all duration-300 active:scale-95;
+  }
+  
+  .input-field {
+    @apply bg-white/5 border border-white/20 rounded-lg px-4 py-2 
+           focus:ring-2 focus:ring-electric-blue focus:border-transparent;
+  }
+}
+
+/* Animations */
+.animate-liquid {
+  animation: liquid 1.5s ease-in-out infinite;
+}
+
+@keyframes liquid {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
