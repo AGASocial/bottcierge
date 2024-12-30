@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
-import type { Product } from '../../types';
+import type { Product, MenuCategory } from '../../types';
 
 interface MenuState {
   products: Product[];
+  categories: MenuCategory[];
   loading: boolean;
   error: string | null;
   selectedProduct: Product | null;
@@ -11,16 +12,25 @@ interface MenuState {
 
 const initialState: MenuState = {
   products: [],
+  categories: [],
   loading: false,
   error: null,
   selectedProduct: null,
 };
 
+export const getCategories = createAsyncThunk(
+  'menu/getCategories',
+  async () => {
+    const response = await api.get('/menu/categories');
+    return response.data.data;
+  }
+);
+
 export const getProducts = createAsyncThunk(
   'menu/getProducts',
   async () => {
     const response = await api.get('/menu/products');
-    return response.data;
+    return response.data.data;
   }
 );
 
@@ -52,16 +62,29 @@ const menuSlice = createSlice({
   name: 'menu',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError(state) {
       state.error = null;
     },
-    setSelectedProduct: (state, action) => {
+    setSelectedProduct(state, action) {
       state.selectedProduct = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Get products
+      // Get Categories
+      .addCase(getCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload;
+      })
+      .addCase(getCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch categories';
+      })
+      // Get Products
       .addCase(getProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -72,9 +95,9 @@ const menuSlice = createSlice({
       })
       .addCase(getProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get products';
+        state.error = action.error.message || 'Failed to fetch products';
       })
-      // Get product by ID
+      // Get Product by ID
       .addCase(getProductById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -85,21 +108,39 @@ const menuSlice = createSlice({
       })
       .addCase(getProductById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get product';
+        state.error = action.error.message || 'Failed to fetch product';
       })
-      // Update product
+      // Update Product
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.products.findIndex(p => p.id === action.payload.id);
         if (index !== -1) {
           state.products[index] = action.payload;
         }
       })
-      // Update inventory
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update product';
+      })
+      // Update Product Inventory
+      .addCase(updateProductInventory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateProductInventory.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.products.findIndex(p => p.id === action.payload.id);
         if (index !== -1) {
           state.products[index] = action.payload;
         }
+      })
+      .addCase(updateProductInventory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update inventory';
       });
   },
 });

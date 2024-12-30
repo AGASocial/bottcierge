@@ -4,32 +4,31 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MagnifyingGlassIcon, ShoppingBagIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 import type { AppDispatch, RootState } from '../store';
-import { getProducts, setSelectedProduct } from '../store/slices/menuSlice';
+import { getProducts, getCategories, setSelectedProduct } from '../store/slices/menuSlice';
 import { addItemToOrder, removeFromCart } from '../store/slices/orderSlice';
 import type { Product, OrderItem } from '../types';
-
-const categories = [
-  { id: 'starters', name: 'Starters' },
-  { id: 'mains', name: 'Main Courses' },
-  { id: 'drinks', name: 'Drinks' },
-  { id: 'desserts', name: 'Desserts' },
-  { id: 'sides', name: 'Sides' },
-];
 
 const Menu: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { venueId } = useParams<{ venueId: string }>();
-  const { products, loading } = useSelector((state: RootState) => state.menu);
+  const { products, loading, categories } = useSelector((state: RootState) => state.menu);
   const { currentVenue } = useSelector((state: RootState) => state.venue);
   const { cart } = useSelector((state: RootState) => state.order);
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('starters');
+  const [activeCategory, setActiveCategory] = useState('');
   const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     dispatch(getProducts());
+    dispatch(getCategories());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0].id);
+    }
+  }, [categories, activeCategory]);
 
   const handleAddToCart = (product: Product) => {
     dispatch(addItemToOrder({

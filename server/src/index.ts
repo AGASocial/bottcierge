@@ -13,10 +13,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Configure CORS to be more permissive
 app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: false
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 
 // Mount routes

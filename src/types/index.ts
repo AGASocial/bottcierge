@@ -66,7 +66,18 @@ export interface Product {
   price: number;
   image?: string;
   category: string;
+  brand: string;
   status: 'available' | 'out_of_stock';
+}
+
+export interface MenuCategory {
+  id: string;
+  name: string;
+  code: string;
+  displayOrder: number;
+  isActive: boolean;
+  parentCategoryId?: string;
+  type: 'food' | 'beverage';
 }
 
 export interface Category {

@@ -67,6 +67,9 @@ export interface Product {
   id: string;
   name: string;
   description: string;
+  brand: string;
+  category: string;
+  section: string;
   brandId: string;
   type: string;
   image: string;
@@ -96,6 +99,16 @@ export interface Brand {
 export interface Section {
   id: string;
   name: string;
+}
+
+export interface MenuCategory {
+  id: string;
+  name: string;
+  code: string;
+  displayOrder: number;
+  isActive: boolean;
+  parentCategoryId?: string;
+  type: 'food' | 'beverage';
 }
 
 export interface Order {
