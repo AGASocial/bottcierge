@@ -74,11 +74,11 @@ export const mockProducts: Product[] = [
     name: 'Grey Goose Vodka',
     description: 'Premium French vodka with exceptional smoothness',
     brand: 'Grey Goose',
-    category: 'spirits',
+    category: 'bottle-list',
     section: 'alcohol',
     brandId: uuidv4(),
     type: 'spirit',
-    image: 'https://example.com/grey-goose.jpg',
+    image: 'https://robohash.org/grey-goose.jpg',
     inventory: {
       current: 100,
       minimum: 20,
@@ -96,6 +96,12 @@ export const mockProducts: Product[] = [
         name: 'Double',
         currentPrice: 24,
         isAvailable: true
+      },
+      {
+        id: uuidv4(),
+        name: 'Bottle',
+        currentPrice: 350,
+        isAvailable: true
       }
     ]
   },
@@ -104,11 +110,11 @@ export const mockProducts: Product[] = [
     name: 'Patrón Silver',
     description: 'Ultra-premium tequila, crystal clear with crisp agave flavor',
     brand: 'Patrón',
-    category: 'spirits',
+    category: 'bottle-list',
     section: 'alcohol',
     brandId: uuidv4(),
     type: 'spirit',
-    image: 'https://example.com/patron-silver.jpg',
+    image: 'https://robohash.org/patron-silver.jpg',
     inventory: {
       current: 80,
       minimum: 15,
@@ -126,6 +132,12 @@ export const mockProducts: Product[] = [
         name: 'Double',
         currentPrice: 28,
         isAvailable: true
+      },
+      {
+        id: uuidv4(),
+        name: 'Bottle',
+        currentPrice: 400,
+        isAvailable: true
       }
     ]
   },
@@ -134,11 +146,11 @@ export const mockProducts: Product[] = [
     name: 'Macallan 12',
     description: 'Single malt Scotch whisky aged in sherry oak casks',
     brand: 'The Macallan',
-    category: 'spirits',
+    category: 'bottle-list',
     section: 'alcohol',
     brandId: uuidv4(),
     type: 'spirit',
-    image: 'https://example.com/macallan12.jpg',
+    image: 'https://robohash.org/macallan12.jpg',
     inventory: {
       current: 50,
       minimum: 10,
@@ -147,14 +159,20 @@ export const mockProducts: Product[] = [
     sizes: [
       {
         id: uuidv4(),
-        name: 'Pour',
-        currentPrice: 22,
+        name: 'Shot',
+        currentPrice: 18,
         isAvailable: true
       },
       {
         id: uuidv4(),
         name: 'Double',
-        currentPrice: 38,
+        currentPrice: 32,
+        isAvailable: true
+      },
+      {
+        id: uuidv4(),
+        name: 'Bottle',
+        currentPrice: 450,
         isAvailable: true
       }
     ]
@@ -164,11 +182,11 @@ export const mockProducts: Product[] = [
     name: 'Zacapa 23',
     description: 'Premium aged rum from Guatemala',
     brand: 'Ron Zacapa',
-    category: 'spirits',
+    category: 'bottle-list',
     section: 'alcohol',
     brandId: uuidv4(),
     type: 'spirit',
-    image: 'https://example.com/zacapa23.jpg',
+    image: 'https://robohash.org/zacapa23.jpg',
     inventory: {
       current: 60,
       minimum: 12,
@@ -177,14 +195,20 @@ export const mockProducts: Product[] = [
     sizes: [
       {
         id: uuidv4(),
-        name: 'Pour',
-        currentPrice: 18,
+        name: 'Shot',
+        currentPrice: 15,
         isAvailable: true
       },
       {
         id: uuidv4(),
         name: 'Double',
-        currentPrice: 32,
+        currentPrice: 26,
+        isAvailable: true
+      },
+      {
+        id: uuidv4(),
+        name: 'Bottle',
+        currentPrice: 380,
         isAvailable: true
       }
     ]
@@ -194,11 +218,11 @@ export const mockProducts: Product[] = [
     name: 'Hendrick\'s Gin',
     description: 'Scottish gin infused with rose and cucumber',
     brand: 'Hendrick\'s',
-    category: 'spirits',
+    category: 'bottle-list',
     section: 'alcohol',
     brandId: uuidv4(),
     type: 'spirit',
-    image: 'https://example.com/hendricks.jpg',
+    image: 'https://robohash.org/hendricks.jpg',
     inventory: {
       current: 70,
       minimum: 15,
@@ -207,14 +231,20 @@ export const mockProducts: Product[] = [
     sizes: [
       {
         id: uuidv4(),
-        name: 'Pour',
-        currentPrice: 15,
+        name: 'Shot',
+        currentPrice: 14,
         isAvailable: true
       },
       {
         id: uuidv4(),
         name: 'Double',
-        currentPrice: 26,
+        currentPrice: 24,
+        isAvailable: true
+      },
+      {
+        id: uuidv4(),
+        name: 'Bottle',
+        currentPrice: 360,
         isAvailable: true
       }
     ]
@@ -224,11 +254,11 @@ export const mockProducts: Product[] = [
     name: 'Fresh Orange Juice',
     description: 'Freshly squeezed orange juice',
     brand: 'House Made',
-    category: 'mixers',
+    category: 'extras',
     section: 'non-alcohol',
     brandId: uuidv4(),
     type: 'juice',
-    image: 'https://example.com/orange-juice.jpg',
+    image: 'https://robohash.org/orange-juice.jpg',
     inventory: {
       current: 200,
       minimum: 50,
@@ -254,11 +284,11 @@ export const mockProducts: Product[] = [
     name: 'Cranberry Juice',
     description: 'Premium cranberry juice',
     brand: 'Ocean Spray',
-    category: 'mixers',
+    category: 'extras',
     section: 'non-alcohol',
     brandId: uuidv4(),
     type: 'juice',
-    image: 'https://example.com/cranberry-juice.jpg',
+    image: 'https://robohash.org/cranberry-juice.jpg',
     inventory: {
       current: 180,
       minimum: 40,
@@ -288,7 +318,7 @@ export const mockProducts: Product[] = [
     section: 'non-alcohol',
     brandId: uuidv4(),
     type: 'soda',
-    image: 'https://example.com/coca-cola.jpg',
+    image: 'https://robohash.org/coca-cola.jpg',
     inventory: {
       current: 300,
       minimum: 100,
@@ -308,11 +338,11 @@ export const mockProducts: Product[] = [
     name: 'Club Soda',
     description: 'Carbonated water for mixing',
     brand: 'Schweppes',
-    category: 'mixers',
+    category: 'extras',
     section: 'non-alcohol',
     brandId: uuidv4(),
     type: 'soda',
-    image: 'https://example.com/club-soda.jpg',
+    image: 'https://robohash.org/club-soda.jpg',
     inventory: {
       current: 250,
       minimum: 80,
@@ -338,11 +368,11 @@ export const mockProducts: Product[] = [
     name: 'Tonic Water',
     description: 'Premium tonic water',
     brand: 'Fever-Tree',
-    category: 'mixers',
+    category: 'extras',
     section: 'non-alcohol',
     brandId: uuidv4(),
     type: 'soda',
-    image: 'https://example.com/tonic-water.jpg',
+    image: 'https://robohash.org/tonic-water.jpg',
     inventory: {
       current: 200,
       minimum: 60,
@@ -394,7 +424,7 @@ export const menuCategories: MenuCategory[] = [
   },
   {
     id: "extras",
-    name: "EXTRA Mixers, Energy Drinks, ICE & cups",
+    name: "EXTRA extras, Energy Drinks, ICE & cups",
     code: "140",
     displayOrder: 4,
     isActive: true,
@@ -444,7 +474,7 @@ export const mockTables: Table[] = [
     id: uuidv4(),
     venueId: mockVenues[0].id,
     number: '101',
-    qrCode: 'https://example.com/qr/101',
+    qrCode: 'https://robohash.org/qr/101',
     category: 'vip',
     section: 'main-floor',
     capacity: {

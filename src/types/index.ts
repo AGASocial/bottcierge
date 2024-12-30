@@ -35,6 +35,8 @@ export interface OrderItem {
   name: string;
   quantity: number;
   price: number;
+  size: string;
+  sizeId: string;
   status: 'pending' | 'preparing' | 'ready' | 'delivered';
 }
 
@@ -68,6 +70,20 @@ export interface Product {
   category: string;
   brand: string;
   status: 'available' | 'out_of_stock';
+  section: string;
+  brandId: string;
+  type: string;
+  inventory: {
+    current: number;
+    minimum: number;
+    maximum: number;
+  };
+  sizes: {
+    id: string;
+    name: string;
+    currentPrice: number;
+    isAvailable: boolean;
+  }[];
 }
 
 export interface MenuCategory {

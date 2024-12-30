@@ -17,6 +17,7 @@ const Menu: React.FC = () => {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const [selectedSizes, setSelectedSizes] = useState<{ [productId: string]: string }>({});
   const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
@@ -31,14 +32,21 @@ const Menu: React.FC = () => {
   }, [categories, activeCategory]);
 
   const handleAddToCart = (product: Product) => {
+    const selectedSize = selectedSizes[product.id] || product.sizes[0].id;
+    const size = product.sizes.find(s => s.id === selectedSize);
+    
+    if (!size) return;
+
     dispatch(addItemToOrder({
       orderId: 'current',
       item: {
         productId: product.id,
-        name: product.name,
+        name: `${product.name} (${size.name})`,
         quantity: 1,
-        price: product.price,
-        status: 'pending'
+        price: size.currentPrice,
+        status: 'pending',
+        sizeId: size.id,
+        size: size.name
       }
     }));
   };
@@ -62,29 +70,46 @@ const Menu: React.FC = () => {
     const quantity = getItemQuantityInCart(product.id);
     const cartItem = cart.find(item => item.productId === product.id);
     
-    return quantity > 0 ? (
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={() => cartItem && handleRemoveFromCart(cartItem.id)}
-          className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+    if (quantity > 0) {
+      return (
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => cartItem && handleRemoveFromCart(cartItem.id)}
+            className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+          >
+            <MinusIcon className="h-4 w-4" />
+          </button>
+          <span className="text-purple-900 font-medium">{quantity}</span>
+          <button
+            onClick={() => handleAddToCart(product)}
+            className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+          >
+            <PlusIcon className="h-4 w-4" />
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        <select
+          value={selectedSizes[product.id] || product.sizes[0].id}
+          onChange={(e) => setSelectedSizes(prev => ({ ...prev, [product.id]: e.target.value }))}
+          className="block w-full px-2 py-1 text-sm rounded bg-purple-700 text-white border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
-          <MinusIcon className="h-4 w-4" />
-        </button>
-        <span className="text-purple-900 font-medium">{quantity}</span>
+          {product.sizes.map(size => (
+            <option key={size.id} value={size.id}>
+              {size.name} - ${size.currentPrice.toFixed(2)}
+            </option>
+          ))}
+        </select>
         <button
           onClick={() => handleAddToCart(product)}
-          className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+          className="w-full px-3 py-1 rounded-full bg-purple-600 text-white text-sm hover:bg-purple-700"
         >
-          <PlusIcon className="h-4 w-4" />
+          Add
         </button>
       </div>
-    ) : (
-      <button
-        onClick={() => handleAddToCart(product)}
-        className="px-3 py-1 rounded-full bg-purple-600 text-white text-sm hover:bg-purple-700"
-      >
-        Add
-      </button>
     );
   };
 
@@ -191,11 +216,16 @@ const Menu: React.FC = () => {
                               <p className="text-sm text-purple-300 mt-1">
                                 {product.description}
                               </p>
+                              <div className="mt-2 space-y-1">
+                                {product.sizes.map(size => (
+                                  <div key={size.id} className="flex justify-between text-sm">
+                                    <span className="text-purple-300">{size.name}</span>
+                                    <span className="text-white">${size.currentPrice.toFixed(2)}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                             <div className="flex flex-col items-end space-y-2">
-                              <span className="text-white font-medium">
-                                ${product.price.toFixed(2)}
-                              </span>
                               {renderQuantityControls(product)}
                             </div>
                           </div>
