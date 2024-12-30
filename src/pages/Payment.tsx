@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { processPayment } from '../store/slices/orderSlice';
-import type { AppDispatch } from '../store';
+import type { AppDispatch, RootState } from '../store';
 
 const Payment: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const { currentOrder } = useSelector((state: RootState) => state.order);
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'cash'>('card');
   const [loading, setLoading] = useState(false);
-  
-  // Get total from location state
-  const { total } = location.state as { total: number };
+
+  // Redirect to cart if no order exists
+  React.useEffect(() => {
+    if (!currentOrder) {
+      navigate('/cart');
+    }
+  }, [currentOrder, navigate]);
+
+  // Don't render anything while redirecting
+  if (!currentOrder) {
+    return null;
+  }
+
+  const total = currentOrder.items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  ) * 1.18; // Including 18% service fee
 
   const handleSubmit = async () => {
     try {
@@ -49,18 +63,18 @@ const Payment: React.FC = () => {
               onClick={() => setSelectedMethod('card')}
               className={`w-full p-4 rounded-lg border ${
                 selectedMethod === 'card'
-                  ? 'border-menu-active bg-menu-active/10'
-                  : 'border-gray-600 hover:border-menu-hover'
+                  ? 'border-purple-500 bg-purple-50 text-black'
+                  : 'border-gray-200'
               }`}
             >
-              Credit/Debit Card
+              Credit Card
             </button>
             <button
               onClick={() => setSelectedMethod('cash')}
               className={`w-full p-4 rounded-lg border ${
                 selectedMethod === 'cash'
-                  ? 'border-menu-active bg-menu-active/10'
-                  : 'border-gray-600 hover:border-menu-hover'
+                  ? 'border-purple-500 bg-purple-50 text-black'
+                  : 'border-gray-200'
               }`}
             >
               Cash
@@ -68,19 +82,31 @@ const Payment: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-6">
-          <div className="flex justify-between mb-4">
-            <span className="text-gray-300">Total</span>
-            <span className="text-xl font-bold">${total.toFixed(2)}</span>
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>${(total / 1.18).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Service Fee (18%)</span>
+              <span>${(total - total / 1.18).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between font-semibold text-lg pt-2 border-t">
+              <span>Total</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
           </div>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full py-3 px-4 bg-menu-active hover:bg-menu-hover text-white font-medium rounded-lg transition-colors duration-200"
-          >
-            {loading ? 'Processing...' : 'Pay Now'}
-          </button>
         </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+        >
+          {loading ? 'Processing...' : `Pay $${total.toFixed(2)}`}
+        </button>
       </div>
     </div>
   );

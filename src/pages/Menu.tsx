@@ -68,6 +68,8 @@ const Menu: React.FC = () => {
   };
 
   const renderQuantityControls = (product: Product) => {
+    if(!currentOrder) return null;
+    
     const quantity = getItemQuantityInCart(product.id) || 0;
     const cartItem = currentOrder?.items.find(item => item.productId === product.id);
 
@@ -141,9 +143,9 @@ const Menu: React.FC = () => {
                 onClick={() => navigate('/cart')}
               >
                 <ShoppingBagIcon className="h-6 w-6 text-white hover:text-purple-300 transition-colors" />
-                {currentOrder!.items.length > 0 && (
+                {currentOrder && currentOrder.items.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-medium rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
-                    {currentOrder!.items.reduce((total, item) => total + item.quantity, 0)}
+                    {currentOrder.items.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
               </div>

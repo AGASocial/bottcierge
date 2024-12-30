@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { QrCodeIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
+import { QrCodeIcon, ClipboardDocumentListIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import type { RootState } from '../store';
+import { getProducts } from 'store/slices/menuSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from 'store';
 
 const Home: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const currentTableCode = useSelector((state: RootState) => state.table.currentTableCode);
+  const { products: allProducts } = useSelector((state: RootState) => state.menu);
+
+  useEffect(() => {
+    dispatch(getProducts());
+  }, [dispatch]);
+
+  // Get 3 random products for featured section
+  const featuredProducts = useMemo(() => {
+    if (!allProducts.length) return [];
+    const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  }, [allProducts]);
 
   const handleStartOrder = () => {
     if (currentTableCode) {
@@ -31,7 +48,7 @@ const Home: React.FC = () => {
             <h2 className="text-xl font-bold">Start a new Order</h2>
           </div>
           <p className="text-gray-300">
-            {currentTableCode 
+            {currentTableCode
               ? "Continue ordering for your current table"
               : "To start a new order, please enter or scan your table's QR code"
             }
@@ -53,34 +70,80 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Featured Section */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Featured Drinks</h2>
-        <div className="glass-card p-6">
-          <p className="text-center text-gray-300">
-            Loading featured drinks...
-          </p>
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
-            onClick={() => navigate('/menu')}
+          <button            
             className="btn-primary"
           >
-            Browse Menu
+            Call Stacy
           </button>
-          <button
-            onClick={() => navigate('/profile')}
+          <button       
             className="btn-secondary"
           >
-            Profile
+            Refill ice
+          </button>
+          <button       
+            className="btn-secondary"
+          >
+            Refill mixers
+          </button>
+          <button       
+            className="btn-secondary"
+          >
+            Refill ice & mixers
           </button>
         </div>
       </div>
+
+      {/* Featured Drinks */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-white mb-6">Featured Drinks</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredProducts.length > 0 ? (
+            featuredProducts.map((product) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+              >
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    {product.description}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-purple-600 font-semibold">
+                      ${product.sizes[0].currentPrice.toFixed(2)}
+                    </span>
+                    <button
+                      onClick={() => navigate('/menu')}
+                      className="text-purple-600 hover:text-purple-700"
+                    >
+                      <ArrowRightIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-3 text-center text-purple-200 py-8">
+              Loading featured drinks...
+            </div>
+          )}
+        </div>
+      </div>
+
+
     </div>
   );
 };
