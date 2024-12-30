@@ -17,7 +17,7 @@ const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16">
         <Outlet />
       </main>
 

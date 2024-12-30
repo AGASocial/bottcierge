@@ -21,7 +21,7 @@ const Table: React.FC = () => {
     (state: RootState) => state.table
   );
   const { currentVenue } = useSelector((state: RootState) => state.venue);
-  const { cart } = useSelector((state: RootState) => state.order);
+  const { currentOrder } = useSelector((state: RootState) => state.order);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const Table: React.FC = () => {
     }
   }, [dispatch, tableId]);
 
-  const handleStartOrder = async () => {    
+  const handleStartOrder = async () => {
     if (!currentTable || !currentVenue) return;
 
     await dispatch(createOrder({
@@ -38,7 +38,7 @@ const Table: React.FC = () => {
       tableId: currentTable.id,
       type: 'regular'
     }));
-    
+
     navigate('/menu');
   };
 
@@ -53,9 +53,8 @@ const Table: React.FC = () => {
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          colors[table.status]
-        }`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[table.status]
+          }`}
       >
         {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
       </span>
@@ -88,9 +87,9 @@ const Table: React.FC = () => {
             >
               <ShoppingCartIcon className="h-5 w-5 mr-2" />
               View Cart
-              {cart.length > 0 && (
+              {currentOrder && currentOrder.items.length > 0 && (
                 <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-purple-500 rounded-full">
-                  {cart.length}
+                  {currentOrder!.items.reduce((total, item) => total + item.quantity, 0)}
                 </span>
               )}
             </button>

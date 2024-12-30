@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MagnifyingGlassIcon, ShoppingBagIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
@@ -10,11 +10,12 @@ import type { Product, OrderItem } from '../types';
 
 const Menu: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { venueId } = useParams<{ venueId: string }>();
   const { products, loading, categories } = useSelector((state: RootState) => state.menu);
   const { currentVenue } = useSelector((state: RootState) => state.venue);
-  const { cart, currentOrder } = useSelector((state: RootState) => state.order);
-  
+  const { currentOrder } = useSelector((state: RootState) => state.order);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
   const [selectedSizes, setSelectedSizes] = useState<{ [productId: string]: string }>({});
@@ -34,7 +35,7 @@ const Menu: React.FC = () => {
   const handleAddToCart = (product: Product) => {
     const selectedSize = selectedSizes[product.id] || product.sizes[0].id;
     const size = product.sizes.find(s => s.id === selectedSize);
-    
+
     if (!size || !currentOrder?.orderNumber) return;
 
     dispatch(addItemToOrder({
@@ -56,7 +57,7 @@ const Menu: React.FC = () => {
   };
 
   const getItemQuantityInCart = (productId: string) => {
-    return cart.reduce((count, item) => (
+    return currentOrder?.items.reduce((count, item) => (
       item.productId === productId ? count + item.quantity : count
     ), 0);
   };
@@ -67,9 +68,9 @@ const Menu: React.FC = () => {
   };
 
   const renderQuantityControls = (product: Product) => {
-    const quantity = getItemQuantityInCart(product.id);
-    const cartItem = cart.find(item => item.productId === product.id);
-    
+    const quantity = getItemQuantityInCart(product.id) || 0;
+    const cartItem = currentOrder?.items.find(item => item.productId === product.id);
+
     if (quantity > 0) {
       return (
         <div className="flex items-center space-x-2">
@@ -135,11 +136,14 @@ const Menu: React.FC = () => {
                 />
                 <MagnifyingGlassIcon className="h-5 w-5 text-purple-300 absolute left-3 top-2.5" />
               </div>
-              <div className="relative">
-                <ShoppingBagIcon className="h-6 w-6 text-white" />
-                {cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cart.reduce((total, item) => total + item.quantity, 0)}
+              <div
+                className="relative cursor-pointer"
+                onClick={() => navigate('/cart')}
+              >
+                <ShoppingBagIcon className="h-6 w-6 text-white hover:text-purple-300 transition-colors" />
+                {currentOrder!.items.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-medium rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
+                    {currentOrder!.items.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
               </div>
@@ -155,11 +159,10 @@ const Menu: React.FC = () => {
                 <button
                   key={category.id}
                   onClick={() => scrollToCategory(category.id)}
-                  className={`text-sm font-medium whitespace-nowrap ${
-                    activeCategory === category.id
-                      ? 'text-white'
-                      : 'text-purple-300 hover:text-white'
-                  }`}
+                  className={`text-sm font-medium whitespace-nowrap ${activeCategory === category.id
+                    ? 'text-white'
+                    : 'text-purple-300 hover:text-white'
+                    }`}
                 >
                   {category.name}
                 </button>
@@ -179,10 +182,10 @@ const Menu: React.FC = () => {
           <div className="space-y-12">
             {categories.map((category) => {
               const categoryProducts = products.filter(
-                p => p.category === category.id && 
-                (searchTerm === '' || p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                p => p.category === category.id &&
+                  (searchTerm === '' || p.name.toLowerCase().includes(searchTerm.toLowerCase()))
               );
-              
+
               if (categoryProducts.length === 0) return null;
 
               return (

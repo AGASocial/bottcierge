@@ -4,7 +4,6 @@ import { Order, OrderItem, OrderStatus } from '../../types';
 
 interface OrderState {
   currentOrder: Order | null;
-  cart: OrderItem[];
   loading: boolean;
   error: string | null;
   orderHistory: Order[];
@@ -20,7 +19,6 @@ interface OrderState {
 
 const initialState: OrderState = {
   currentOrder: null,
-  cart: [],
   loading: false,
   error: null,
   orderHistory: [],
@@ -81,16 +79,22 @@ const orderSlice = createSlice({
   initialState,
   reducers: {
     clearCart: (state) => {
-      state.cart = [];
+      if (state.currentOrder) {
+        state.currentOrder.items = [];
+      }
     },
     removeFromCart: (state, action) => {
-      state.cart = state.cart.filter(item => item.id !== action.payload);
+      if (state.currentOrder) {
+        state.currentOrder.items = state.currentOrder.items.filter(item => item.id !== action.payload);
+      }
     },
     updateItemQuantity: (state, action) => {
-      const { id, quantity } = action.payload;
-      const item = state.cart.find(item => item.id === id);
-      if (item) {
-        item.quantity = quantity;
+      if (state.currentOrder) {
+        const { id, quantity } = action.payload;
+        const item = state.currentOrder.items.find(item => item.id === id);
+        if (item) {
+          item.quantity = quantity;
+        }
       }
     },
     clearError: (state) => {
@@ -131,7 +135,6 @@ const orderSlice = createSlice({
         if (action.payload.status === OrderStatus.COMPLETED) {
           state.orderHistory.unshift(action.payload);
           state.currentOrder = null;
-          state.cart = [];
         }
       })
       // Add item to order
@@ -149,7 +152,6 @@ const orderSlice = createSlice({
       })
       .addCase(processPayment.fulfilled, (state) => {
         state.loading = false;
-        state.cart = [];
         state.currentOrder = null;
       })
       .addCase(processPayment.rejected, (state, action) => {
@@ -159,11 +161,6 @@ const orderSlice = createSlice({
   },
 });
 
-export const {
-  clearCart,
-  removeFromCart,
-  updateItemQuantity,
-  clearError,
-} = orderSlice.actions;
+export const { clearCart, removeFromCart, updateItemQuantity, clearError } = orderSlice.actions;
 
 export default orderSlice.reducer;

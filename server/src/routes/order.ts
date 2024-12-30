@@ -51,25 +51,50 @@ router.post('/:id/items', (req, res) => {
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
   }
-  order.items.push({ ...req.body, id: uuidv4() });
+  
+  // Check if item already exists in order
+  const existingItem = order.items.find(item => 
+    item.productId === req.body.productId && 
+    item.size === req.body.size
+  );
+
+  if (existingItem) {
+    existingItem.quantity += req.body.quantity;
+  } else {
+    order.items.push({ ...req.body, id: uuidv4() });
+  }
+  
   order.total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   res.json(order);
 });
 
 // Remove item from order
 router.delete('/:orderId/items/:itemId', (req, res) => {
-  const order = mockOrders.find(o => o.id === req.params.orderId);
+  const { orderId, itemId } = req.params;
+  const order = mockOrders.find(o => o.id === orderId);
+
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
   }
-  
-  const itemIndex = order.items.findIndex(item => item.id === req.params.itemId);
+
+  const itemIndex = order.items.findIndex(item => item.id === itemId);
   if (itemIndex === -1) {
     return res.status(404).json({ message: 'Item not found' });
   }
+
+  const item = order.items[itemIndex];
   
-  order.items.splice(itemIndex, 1);
+  // Decrease quantity by 1
+  item.quantity--;
+
+  // Remove item if quantity reaches 0
+  if (item.quantity <= 0) {
+    order.items.splice(itemIndex, 1);
+  }
+
+  // Update order total
   order.total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
   res.json(order);
 });
 

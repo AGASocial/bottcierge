@@ -13,11 +13,11 @@ interface CartSummaryProps {
 
 const CartSummary: React.FC<CartSummaryProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart } = useSelector((state: RootState) => state.order);
-  
-  const subtotal = calculateSubtotal(cart);
+  const { currentOrder } = useSelector((state: RootState) => state.order);
+
+  const subtotal = calculateSubtotal(currentOrder!.items);
   const tax = calculateTax(subtotal);
-  const total = calculateTotal(cart);
+  const total = calculateTotal(currentOrder!.items);
 
   const handlePayment = () => {
     navigate('/payment', { state: { total } });
@@ -45,7 +45,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            {cart.map((item) => (
+            {currentOrder!.items.map((item) => (
               <div key={item.id} className="flex justify-between py-2">
                 <span>
                   {item.name} x{item.quantity}
@@ -55,7 +55,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ isOpen, onClose }) => {
             ))}
           </div>
 
-          {cart.length > 0 && (
+          {currentOrder!.items.length > 0 && (
             <div className="border-t p-4 bg-gray-50">
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">

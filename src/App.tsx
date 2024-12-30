@@ -5,6 +5,7 @@ import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Menu from './pages/Menu';
+import Cart from './pages/Cart';
 import Table from './pages/Table';
 import TableScan from './pages/TableScan';
 import Profile from './pages/Profile';
@@ -37,6 +38,7 @@ function App() {
         }>
           <Route index element={<Home />} />
           <Route path="menu" element={<Menu />} />
+          <Route path="cart" element={<Cart />} />
           <Route path="table/scan" element={<TableScan />} />
           <Route path="table/:tableId" element={<Table />} />
           <Route path="profile" element={<Profile />} />
