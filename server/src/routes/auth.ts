@@ -10,12 +10,13 @@ router.post('/login', (req, res) => {
   const user = mockUsers.find(u => u.email === email);
   console.log(password);
   if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
   
   // In a real app, you would verify the password here
   return res.json({
-    user,
+    success: true,
+    data: user,
     token: 'mock-jwt-token'
   });
 });
@@ -26,7 +27,7 @@ router.post('/register', (req, res) => {
   const existingUser = mockUsers.find(u => u.email === email);
   
   if (existingUser) {
-    return res.status(400).json({ message: 'Email already registered' });
+    return res.status(400).json({ success: false, message: 'Email already registered' });
   }
   
   const newUser = {
@@ -38,13 +39,26 @@ router.post('/register', (req, res) => {
   };
   
   mockUsers.push(newUser);
-  return res.status(201).json(newUser);
+  return res.status(201).json({
+    success: true,
+    data: newUser,
+    token: 'mock-jwt-token'
+  });
 });
 
 // Get current user
 router.get('/me', (req, res) => {
   // In a real app, you would get the user from the JWT token
-  res.json(mockUsers[0]);
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token || token !== 'mock-jwt-token') {
+    return res.status(401).json({ success: false, message: 'Invalid token' });
+  }
+
+  res.json({
+    success: true,
+    data: mockUsers[0]
+  });
 });
 
 export const authRoutes = router;

@@ -52,6 +52,7 @@ export enum OrderStatus {
 
 export interface Order {
   id: string;
+  orderNumber: string;
   userId: string;
   tableId: string;
   items: OrderItem[];

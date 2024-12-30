@@ -13,7 +13,7 @@ const Menu: React.FC = () => {
   const { venueId } = useParams<{ venueId: string }>();
   const { products, loading, categories } = useSelector((state: RootState) => state.menu);
   const { currentVenue } = useSelector((state: RootState) => state.venue);
-  const { cart } = useSelector((state: RootState) => state.order);
+  const { cart, currentOrder } = useSelector((state: RootState) => state.order);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
@@ -35,10 +35,10 @@ const Menu: React.FC = () => {
     const selectedSize = selectedSizes[product.id] || product.sizes[0].id;
     const size = product.sizes.find(s => s.id === selectedSize);
     
-    if (!size) return;
+    if (!size || !currentOrder?.orderNumber) return;
 
     dispatch(addItemToOrder({
-      orderId: 'current',
+      orderId: currentOrder.id,
       item: {
         productId: product.id,
         name: `${product.name} (${size.name})`,

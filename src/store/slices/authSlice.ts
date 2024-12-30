@@ -19,15 +19,20 @@ export const login = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     const response = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', response.data.token);
-    return response.data.user;
+    return response.data.data;
   }
 );
 
 export const getCurrentUser = createAsyncThunk(
   'auth/getCurrentUser',
   async () => {
-    const response = await api.get('/auth/me');
-    return response.data;
+    try {
+      const response = await api.get('/auth/me');
+      return response.data.data;
+    } catch (error) {
+      localStorage.removeItem('token');
+      throw error;
+    }
   }
 );
 
@@ -36,7 +41,7 @@ export const register = createAsyncThunk(
   async (userData: Partial<User>) => {
     const response = await api.post('/auth/register', userData);
     localStorage.setItem('token', response.data.token);
-    return response.data.user;
+    return response.data.data;
   }
 );
 
@@ -65,9 +70,9 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message || 'Failed to login';
       })
-      // Get current user
+      // Get Current User
       .addCase(getCurrentUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -78,7 +83,8 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get user';
+        state.error = action.error.message || 'Failed to get current user';
+        state.user = null;
       })
       // Register
       .addCase(register.pending, (state) => {
@@ -91,7 +97,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Registration failed';
+        state.error = action.error.message || 'Failed to register';
       });
   },
 });
