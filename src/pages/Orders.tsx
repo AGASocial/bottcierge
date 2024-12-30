@@ -28,7 +28,7 @@ const OrderStatusBadge: React.FC<{ status: Order['status'] }> = ({ status }) => 
 const Orders: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { orderHistory: orders, loading, error } = useSelector((state: RootState) => state.order);
-  const [filter, setFilter] = useState<'all' | 'active' | 'past'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'past'>('active');
 
   useEffect(() => {
     dispatch(getOrders());
@@ -36,10 +36,10 @@ const Orders: React.FC = () => {
 
   const filteredOrders = orders.filter((order: Order) => {
     if (filter === 'active') {
-      return ['pending', 'confirmed', 'preparing'].includes(order.status);
+      return ['created', 'authorized', 'pending', 'confirmed', 'preparing'].includes(order.status);
     }
     if (filter === 'past') {
-      return ['delivered', 'paid'].includes(order.status);
+      return ['served', 'completed', 'cancelled', 'delivered', 'paid'].includes(order.status);
     }
     return true;
   });
@@ -59,31 +59,28 @@ const Orders: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded ${
-              filter === 'all'
+            className={`px-4 py-2 rounded ${filter === 'all'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 hover:bg-gray-200'
-            }`}
+              }`}
           >
             All
           </button>
           <button
             onClick={() => setFilter('active')}
-            className={`px-4 py-2 rounded ${
-              filter === 'active'
+            className={`px-4 py-2 rounded ${filter === 'active'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 hover:bg-gray-200'
-            }`}
+              }`}
           >
             Active
           </button>
           <button
             onClick={() => setFilter('past')}
-            className={`px-4 py-2 rounded ${
-              filter === 'past'
+            className={`px-4 py-2 rounded ${filter === 'past'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 hover:bg-gray-200'
-            }`}
+              }`}
           >
             Past
           </button>
@@ -96,12 +93,12 @@ const Orders: React.FC = () => {
             key={order.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-md p-6"
+            className="text-black bg-white rounded-lg shadow-md p-6"
           >
             <div className="flex justify-between items-start mb-4">
               <div>
                 <div className="flex items-center space-x-4 mb-2">
-                  <h3 className="text-xl font-bold">Order #{order.id}</h3>
+                  <h3 className="text-xl font-bold">Order #{order.orderNumber}</h3>
                   <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex items-center space-x-2 text-gray-500">

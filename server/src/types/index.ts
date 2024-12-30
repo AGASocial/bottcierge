@@ -117,7 +117,8 @@ export interface Order {
   status: OrderStatus;
   items: OrderItem[];
   total: number;
-  timestamp: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Staff {

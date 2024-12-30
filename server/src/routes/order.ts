@@ -27,7 +27,8 @@ router.post('/', (req, res) => {
     status: OrderStatus.CREATED,
     items: [],
     total: 0,
-    timestamp: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
     ...req.body
   };
   mockOrders.push(newOrder);

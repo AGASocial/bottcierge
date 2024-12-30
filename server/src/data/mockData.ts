@@ -445,10 +445,20 @@ export const mockOrders: Order[] = [
   {
     id: uuidv4(),
     orderNumber: 'ORD-001',
-    status: OrderStatus.CREATED,
-    items: [],
+    status: OrderStatus.CANCELLED,
+    items: [{
+      "productId": "54f30562-d4fd-4e17-8985-63c651bb0ad2",
+      "name": "Grey Goose Vodka (Shot)",
+      "quantity": 1,
+      "price": 14,
+      "mixers": [],
+      "garnishes": [],
+      "size": "Shot",
+      "id": "975a72b7-adf5-42e4-acc8-32f40da18598"
+    }],
     total: 0,
-    timestamp: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 

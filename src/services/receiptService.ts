@@ -31,7 +31,7 @@ interface ReceiptDetails {
       items?: OrderItem[];
     }[];
   };
-  timestamp: string;
+  createdAt: string;
 }
 
 interface EmailReceipt {
