@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @layer base {
   body {
@@ -10,17 +10,15 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/10 backdrop-blur-glass rounded-xl border border-white/20;
+    @apply bg-white/10 backdrop-blur-md rounded-xl border border-white/20;
   }
   
   .btn-primary {
-    @apply px-4 py-2 bg-electric-blue hover:bg-electric-blue/90 rounded-lg 
-           transition-all duration-300 active:scale-95;
+    @apply bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply px-4 py-2 bg-neon-pink hover:bg-neon-pink/90 rounded-lg 
-           transition-all duration-300 active:scale-95;
+    @apply bg-neon-pink text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-200;
   }
   
   .input-field {

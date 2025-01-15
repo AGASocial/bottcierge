@@ -36,12 +36,24 @@ router.post('/', (req, res) => {
 });
 
 // Update order status
-router.patch('/:id/status', (req, res) => {
-  const order = mockOrders.find(o => o.id === req.params.id);
+router.patch('/:id', (req, res) => {
+  var order = mockOrders.find(o => o.id === req.params.id);
   if (!order) {
-    return res.status(404).json({ message: 'Order not found' });
+    const newOrder = {
+      id: req.params.id,
+      orderNumber: `ORD-${Math.floor(Math.random() * 1000)}`,
+      status: OrderStatus.CREATED,
+      items: [],
+      total: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...req.body
+    };
+    mockOrders.push(newOrder);
+    // return res.status(404).json({ message: 'Order not found' });
   }
-  order.status = req.body.status;
+  order = mockOrders.find(o => o.id === req.params.id);
+  order!.status = req.body.status;
   res.json(order);
 });
 
@@ -51,10 +63,10 @@ router.post('/:id/items', (req, res) => {
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
   }
-  
+
   // Check if item already exists in order
-  const existingItem = order.items.find(item => 
-    item.productId === req.body.productId && 
+  const existingItem = order.items.find(item =>
+    item.productId === req.body.productId &&
     item.size === req.body.size
   );
 
@@ -63,7 +75,7 @@ router.post('/:id/items', (req, res) => {
   } else {
     order.items.push({ ...req.body, id: uuidv4() });
   }
-  
+
   order.total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   res.json(order);
 });
@@ -83,7 +95,7 @@ router.delete('/:orderId/items/:itemId', (req, res) => {
   }
 
   const item = order.items[itemIndex];
-  
+
   // Decrease quantity by 1
   item.quantity--;
 
@@ -94,7 +106,7 @@ router.delete('/:orderId/items/:itemId', (req, res) => {
 
   // Update order total
   order.total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  
+
   res.json(order);
 });
 

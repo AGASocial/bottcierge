@@ -37,6 +37,7 @@ export interface OrderItem {
   price: number;
   size: string;
   sizeId: string;
+  customizations: Record<string, string | string[]>;
   status: 'pending' | 'preparing' | 'ready' | 'delivered';
 }
 

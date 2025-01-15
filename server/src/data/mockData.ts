@@ -72,7 +72,7 @@ export const mockProducts: Product[] = [
   {
     id: uuidv4(),
     name: 'Grey Goose Vodka',
-    description: 'Premium French vodka with exceptional smoothness',
+    description: 'Premium French vodka with exceptional smoothness. Distilled in France. Bottled in the US.',
     brand: 'Grey Goose',
     category: 'bottle-list',
     section: 'alcohol',

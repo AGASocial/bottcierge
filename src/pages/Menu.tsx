@@ -15,6 +15,7 @@ const Menu: React.FC = () => {
   const { products, loading, categories } = useSelector((state: RootState) => state.menu);
   const { currentVenue } = useSelector((state: RootState) => state.venue);
   const { currentOrder } = useSelector((state: RootState) => state.order);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string | string[]>>({});
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
@@ -47,7 +48,8 @@ const Menu: React.FC = () => {
         price: size.currentPrice,
         status: 'pending',
         sizeId: size.id,
-        size: size.name
+        size: size.name,
+        customizations: selectedOptions
       }
     }));
   };
@@ -68,8 +70,8 @@ const Menu: React.FC = () => {
   };
 
   const renderQuantityControls = (product: Product) => {
-    if(!currentOrder) return null;
-    
+    if (!currentOrder) return null;
+
     const quantity = getItemQuantityInCart(product.id) || 0;
     const cartItem = currentOrder?.items.find(item => item.productId === product.id);
 
@@ -201,7 +203,8 @@ const Menu: React.FC = () => {
                     {categoryProducts.map((product) => (
                       <div
                         key={product.id}
-                        className="bg-purple-800 rounded-lg shadow-lg overflow-hidden"
+                        className="bg-purple-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-purple-700 transition-colors"
+                        onClick={() => navigate(`/menu/${product.id}`)}
                       >
                         {product.image && (
                           <div className="aspect-w-16 aspect-h-9">
@@ -230,9 +233,7 @@ const Menu: React.FC = () => {
                                 ))}
                               </div>
                             </div>
-                            <div className="flex flex-col items-end space-y-2">
-                              {renderQuantityControls(product)}
-                            </div>
+
                           </div>
                         </div>
                       </div>

@@ -4,9 +4,10 @@ import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { QrCodeIcon, ClipboardDocumentListIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import type { RootState } from '../store';
-import { getProducts } from 'store/slices/menuSlice';
+import { getProducts } from '../store/slices/menuSlice';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from 'store';
+import { AppDispatch } from '../store';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,8 +34,33 @@ const Home: React.FC = () => {
     }
   };
 
+  const handleCallStacy = () => {
+    toast.success('Stacy has been notified and will be with you shortly!', {
+      icon: '👋',
+      duration: 3000,
+      style: {
+        background: '#dedede',
+        color: '#000',
+        borderRadius: '10px',
+      },
+    });
+  };
+
+  const handleRefill = (text: string) => {
+    toast.success(`${text}`, {
+      icon: '🍹',
+      duration: 3000,
+      style: {
+        background: '#dedede',
+        color: '#000',
+        borderRadius: '10px',
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <Toaster position="top-center" />
       <h1 className="text-3xl font-bold mb-8">Welcome to Bottcierge</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -74,22 +100,26 @@ const Home: React.FC = () => {
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button            
+          <button
+            onClick={handleCallStacy}
             className="btn-primary"
           >
             Call Stacy
           </button>
-          <button       
+          <button
+            onClick={() => handleRefill('Ice is on the way!')}
             className="btn-secondary"
           >
             Refill ice
           </button>
-          <button       
+          <button
+            onClick={() => handleRefill('Mixers are on the way!')}
             className="btn-secondary"
           >
             Refill mixers
           </button>
-          <button       
+          <button
+            onClick={() => handleRefill('Ice & mixers are on the way!')}
             className="btn-secondary"
           >
             Refill ice & mixers
@@ -142,8 +172,6 @@ const Home: React.FC = () => {
           )}
         </div>
       </div>
-
-
     </div>
   );
 };

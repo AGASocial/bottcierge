@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
 import Receipt from './pages/Receipt';
+import ProductDetails from './pages/ProductDetails';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { getCurrentUser } from './store/slices/authSlice';
 import type { AppDispatch } from './store';
@@ -38,6 +39,7 @@ function App() {
         }>
           <Route index element={<Home />} />
           <Route path="menu" element={<Menu />} />
+          <Route path="menu/:productId" element={<ProductDetails />} />
           <Route path="cart" element={<Cart />} />
           <Route path="table/scan" element={<TableScan />} />
           <Route path="table/:tableId" element={<Table />} />
