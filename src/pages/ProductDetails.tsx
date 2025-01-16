@@ -26,11 +26,14 @@ const ProductDetails: React.FC = () => {
   const { products } = useSelector((state: RootState) => state.menu);
   const { currentOrder } = useSelector((state: RootState) => state.order);
   const product = products.find(p => p.id === productId);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0]);
+  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes[0]?.id || '');
   const [customizationOptions, setCustomizationOptions] = useState<CustomizationOption[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string | string[]>>({});
 
   useEffect(() => {
+    if (product && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0].id);
+    }
     // TODO: Fetch customization options from backend
     // This is a mock example
     if (product?.category === 'bottle-list') {
@@ -78,7 +81,10 @@ const ProductDetails: React.FC = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!selectedSize || !product || !currentOrder) return;
+    if (!product || !currentOrder) return;
+
+    const selectedSizeObj = product.sizes.find(s => s.id === selectedSize);
+    if (!selectedSizeObj) return;
 
     try {
       await dispatch(addItemToOrder({
@@ -87,17 +93,21 @@ const ProductDetails: React.FC = () => {
           productId: product.id,
           name: product.name,
           quantity: 1,
-          price: selectedSize.currentPrice,
-          size: selectedSize.name,
-          sizeId: selectedSize.id,
-          customizations: selectedOptions,
+          price: selectedSizeObj.currentPrice,
+          totalPrice: selectedSizeObj.currentPrice,
+          size: {
+            id: selectedSizeObj.id,
+            name: selectedSizeObj.name,
+            currentPrice: selectedSizeObj.currentPrice,
+            isAvailable: selectedSizeObj.isAvailable
+          },
+          options: selectedOptions,
           status: 'pending'
         }
-      }));
-
+      })).unwrap();
       navigate('/menu');
     } catch (error) {
-      console.error('Failed to add item to order:', error);
+      console.error('Failed to add item:', error);
     }
   };
 
@@ -131,9 +141,9 @@ const ProductDetails: React.FC = () => {
                 {product.sizes.map(size => (
                   <button
                     key={size.id}
-                    onClick={() => setSelectedSize(size)}
+                    onClick={() => setSelectedSize(size.id)}
                     className={`p-3 rounded-lg border-2 transition-colors ${
-                      selectedSize?.id === size.id
+                      selectedSize === size.id
                         ? 'border-light-blue bg-deep-blue'
                         : 'border-deep-blue hover:border-light-blue'
                     }`}

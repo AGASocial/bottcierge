@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
-import { Order, OrderItem, OrderStatus } from '../../types';
+import type { Order, OrderItem, OrderStatus } from '../../types';
 
 interface OrderState {
   currentOrder: Order | null;
@@ -132,7 +132,7 @@ const orderSlice = createSlice({
       // Update order status
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.currentOrder = action.payload;
-        if (action.payload.status === OrderStatus.COMPLETED) {
+        if (action.payload.status === 'completed' as OrderStatus) {
           state.orderHistory.unshift(action.payload);
           state.currentOrder = null;
         }

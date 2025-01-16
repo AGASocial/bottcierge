@@ -29,27 +29,26 @@ export interface OrderHistory {
   total: number;
 }
 
+export interface Size {
+  id: string;
+  name: string;
+  currentPrice: number;
+  isAvailable: boolean;
+}
+
 export interface OrderItem {
   id: string;
   productId: string;
   name: string;
-  quantity: number;
   price: number;
-  size: string;
-  sizeId: string;
-  customizations: Record<string, string | string[]>;
+  totalPrice: number;
+  quantity: number;
+  size: Size;
+  options: Record<string, string | string[]>;
   status: 'pending' | 'preparing' | 'ready' | 'delivered';
 }
 
-export enum OrderStatus {
-  CREATED = 'created',
-  AUTHORIZED = 'authorized',
-  PREPARING = 'preparing',
-  READY = 'ready',
-  SERVED = 'served',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
-}
+export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled';
 
 export interface Order {
   id: string;
@@ -57,7 +56,7 @@ export interface Order {
   userId: string;
   tableId: string;
   items: OrderItem[];
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'paid';
+  status: OrderStatus;
   total: number;
   createdAt: string;
   updatedAt: string;
@@ -80,12 +79,7 @@ export interface Product {
     minimum: number;
     maximum: number;
   };
-  sizes: {
-    id: string;
-    name: string;
-    currentPrice: number;
-    isAvailable: boolean;
-  }[];
+  sizes: Size[];
 }
 
 export interface MenuCategory {

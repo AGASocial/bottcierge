@@ -1,58 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClockIcon } from '@heroicons/react/24/outline';
-import { getOrders } from '../store/slices/orderSlice';
-import type { AppDispatch, RootState } from '../store';
-import type { Order } from '../types';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
+import type { Order, OrderItem, OrderStatus } from '../types';
 
-const OrderStatusBadge: React.FC<{ status: Order['status'] }> = ({ status }) => {
-  const statusColors = {
+const Orders: React.FC = () => {
+  const navigate = useNavigate();
+  const orders = useSelector((state: RootState) => state.order.orderHistory) || [];
+
+  const statusColors: Record<OrderStatus, string> = {
     pending: 'bg-yellow-500',
     preparing: 'bg-light-blue',
     ready: 'bg-green-500',
     delivered: 'bg-gray-500',
     completed: 'bg-gray-500',
-    cancelled: 'bg-red-500',
+    cancelled: 'bg-red-500'
   };
-
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
-        statusColors[status]
-      }`}
-    >
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
-  );
-};
-
-const Orders: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { orderHistory: orders, loading, error } = useSelector((state: RootState) => state.order);
-  const [filter, setFilter] = useState<'all' | 'active' | 'past'>('active');
-
-  useEffect(() => {
-    dispatch(getOrders());
-  }, [dispatch]);
-
-  const filteredOrders = orders.filter((order: Order) => {
-    if (filter === 'active') {
-      return ['created', 'authorized', 'pending', 'confirmed', 'preparing'].includes(order.status);
-    }
-    if (filter === 'past') {
-      return ['served', 'completed', 'cancelled', 'delivered', 'paid'].includes(order.status);
-    }
-    return true;
-  });
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <div className="min-h-screen bg-deep-blue">
@@ -60,7 +24,7 @@ const Orders: React.FC = () => {
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 border border-white/20">
           <h1 className="text-2xl font-bold text-white mb-6">Your Orders</h1>
 
-          {filteredOrders.length === 0 ? (
+          {orders.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-light-blue mb-4">No orders yet</p>
               <button
@@ -72,7 +36,7 @@ const Orders: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredOrders.map((order) => (
+              {orders.map((order: Order) => (
                 <div
                   key={order.id}
                   className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/20"
@@ -87,11 +51,17 @@ const Orders: React.FC = () => {
                         {new Date(order.createdAt).toLocaleString()}
                       </p>
                     </div>
-                    <OrderStatusBadge status={order.status} />
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
+                        statusColors[order.status as OrderStatus]
+                      }`}
+                    >
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </span>
                   </div>
 
                   <div className="space-y-3">
-                    {order.items.map((item) => (
+                    {order.items.map((item: OrderItem) => (
                       <div
                         key={item.id}
                         className="flex justify-between items-center py-2 border-t border-white/10"
@@ -106,7 +76,7 @@ const Orders: React.FC = () => {
                               {category}:{' '}
                               {Array.isArray(selection)
                                 ? selection.join(', ')
-                                : selection}
+                                : String(selection)}
                             </p>
                           ))}
                         </div>

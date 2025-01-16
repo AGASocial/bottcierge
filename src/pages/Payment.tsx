@@ -12,6 +12,10 @@ const Payment: React.FC = () => {
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'cash'>('card');
   const [loading, setLoading] = useState(false);
 
+  const handleMethodChange = (method: 'card' | 'cash') => {
+    setSelectedMethod(method);
+  };
+
   // Redirect to cart if no order exists
   React.useEffect(() => {
     if (!currentOrder) {
@@ -78,7 +82,7 @@ const Payment: React.FC = () => {
                     name="paymentMethod"
                     value="card"
                     checked={selectedMethod === 'card'}
-                    onChange={(e) => setSelectedMethod(e.target.value)}
+                    onChange={() => handleMethodChange('card')}
                     className="mr-3"
                   />
                   <div className="flex items-center">
@@ -93,7 +97,7 @@ const Payment: React.FC = () => {
                     name="paymentMethod"
                     value="cash"
                     checked={selectedMethod === 'cash'}
-                    onChange={(e) => setSelectedMethod(e.target.value)}
+                    onChange={() => handleMethodChange('cash')}
                     className="mr-3"
                   />
                   <div className="flex items-center">

@@ -34,10 +34,15 @@ const Menu: React.FC = () => {
   }, [categories, activeCategory]);
 
   const handleAddToCart = (product: Product) => {
-    const selectedSize = selectedSizes[product.id] || product.sizes[0].id;
-    const size = product.sizes.find(s => s.id === selectedSize);
+    const defaultSize = product.sizes[0];
+    const size = {
+      id: defaultSize.id,
+      name: defaultSize.name,
+      currentPrice: defaultSize.currentPrice,
+      isAvailable: defaultSize.isAvailable
+    };
 
-    if (!size || !currentOrder?.orderNumber) return;
+    if (!currentOrder?.orderNumber) return;
 
     dispatch(addItemToOrder({
       orderId: currentOrder.id,
@@ -45,11 +50,11 @@ const Menu: React.FC = () => {
         productId: product.id,
         name: `${product.name} (${size.name})`,
         quantity: 1,
-        price: size.currentPrice,
-        status: 'pending',
-        sizeId: size.id,
-        size: size.name,
-        customizations: selectedOptions
+        price: defaultSize.currentPrice,
+        totalPrice: defaultSize.currentPrice,
+        size,
+        options: {},
+        status: 'pending'
       }
     }));
   };
@@ -104,7 +109,7 @@ const Menu: React.FC = () => {
         >
           {product.sizes.map(size => (
             <option key={size.id} value={size.id}>
-              {size.name} - ${size.currentPrice.toFixed(2)}
+              {size.name} - ${size.currentPrice?.toFixed(2)}
             </option>
           ))}
         </select>
@@ -228,7 +233,7 @@ const Menu: React.FC = () => {
                                 {product.sizes.map(size => (
                                   <div key={size.id} className="flex justify-between text-sm">
                                     <span className="text-light-blue">{size.name}</span>
-                                    <span className="text-white">${size.currentPrice.toFixed(2)}</span>
+                                    <span className="text-white">${size.currentPrice?.toFixed(2)}</span>
                                   </div>
                                 ))}
                               </div>
