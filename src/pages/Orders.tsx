@@ -7,18 +7,20 @@ import type { AppDispatch, RootState } from '../store';
 import type { Order } from '../types';
 
 const OrderStatusBadge: React.FC<{ status: Order['status'] }> = ({ status }) => {
-  const colors = {
+  const statusColors = {
     pending: 'bg-yellow-500',
-    confirmed: 'bg-blue-500',
-    preparing: 'bg-purple-500',
+    preparing: 'bg-light-blue',
     ready: 'bg-green-500',
     delivered: 'bg-gray-500',
-    paid: 'bg-green-500',
+    completed: 'bg-gray-500',
+    cancelled: 'bg-red-500',
   };
 
   return (
     <span
-      className={`px-2 py-1 rounded-full text-white text-sm ${colors[status]}`}
+      className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
+        statusColors[status]
+      }`}
     >
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
@@ -53,85 +55,86 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Orders</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded ${filter === 'all'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('active')}
-            className={`px-4 py-2 rounded ${filter === 'active'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-          >
-            Active
-          </button>
-          <button
-            onClick={() => setFilter('past')}
-            className={`px-4 py-2 rounded ${filter === 'past'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-          >
-            Past
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-deep-blue">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 border border-white/20">
+          <h1 className="text-2xl font-bold text-white mb-6">Your Orders</h1>
 
-      <div className="space-y-4">
-        {filteredOrders.map((order: Order) => (
-          <motion.div
-            key={order.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-black bg-white rounded-lg shadow-md p-6"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <div className="flex items-center space-x-4 mb-2">
-                  <h3 className="text-xl font-bold">Order #{order.orderNumber}</h3>
-                  <OrderStatusBadge status={order.status} />
-                </div>
-                <div className="flex items-center space-x-2 text-gray-500">
-                  <ClockIcon className="w-4 h-4" />
-                  <span>{new Date(order.createdAt).toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold">${order.total.toFixed(2)}</p>
-              </div>
+          {filteredOrders.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-light-blue mb-4">No orders yet</p>
+              <button
+                onClick={() => navigate('/menu')}
+                className="px-6 py-2 bg-white/5 border border-white/20 text-white rounded-full hover:bg-light-blue"
+              >
+                Start New Order
+              </button>
             </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">Items</h4>
-              <div className="space-y-2">
-                {order.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-between items-center"
-                  >
+          ) : (
+            <div className="space-y-4">
+              {filteredOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/20"
+                >
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-gray-500">
-                        Qty: {item.quantity}
+                      <div className="flex items-center gap-2 mb-2">
+                        <ClockIcon className="h-5 w-5 text-light-blue" />
+                        <h2 className="font-semibold text-white">Order #{order.orderNumber}</h2>
+                      </div>
+                      <p className="text-sm text-light-blue">
+                        {new Date(order.createdAt).toLocaleString()}
                       </p>
                     </div>
-                    <p>${(item.price * item.quantity).toFixed(2)}</p>
+                    <OrderStatusBadge status={order.status} />
                   </div>
-                ))}
-              </div>
+
+                  <div className="space-y-3">
+                    {order.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex justify-between items-center py-2 border-t border-white/10"
+                      >
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium">{item.name}</h3>
+                          <p className="text-sm text-light-blue">
+                            Size: {item.size.name}
+                          </p>
+                          {item.options && Object.entries(item.options).map(([category, selection]) => (
+                            <p key={category} className="text-sm text-light-blue">
+                              {category}:{' '}
+                              {Array.isArray(selection)
+                                ? selection.join(', ')
+                                : selection}
+                            </p>
+                          ))}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">
+                            ${(item.quantity * item.totalPrice).toFixed(2)}
+                          </div>
+                          <div className="text-sm text-light-blue">
+                            Qty: {item.quantity}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <div className="flex justify-between text-white">
+                      <span>Total</span>
+                      <span className="font-bold">
+                        ${order.total.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </motion.div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );

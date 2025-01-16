@@ -28,7 +28,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen bg-purple-900 text-white">
+    <div className="min-h-screen bg-deep-blue text-white">
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Navigate to="/auth" replace />} />

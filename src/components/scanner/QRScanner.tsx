@@ -106,7 +106,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
-            className="bg-purple-800 rounded-lg p-4 max-w-lg w-full"
+            className="bg-deep-blue rounded-lg p-4 max-w-lg w-full"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-white">Scan QR Code</h2>
@@ -115,7 +115,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
                   stopScanning();
                   onClose();
                 }}
-                className="text-purple-200 hover:text-white focus:outline-none"
+                className="text-light-blue hover:text-white focus:outline-none"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
@@ -161,7 +161,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
             <div className="flex justify-center">
               <button
                 onClick={toggleScanning}
-                className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex items-center px-4 py-2 bg-deep-blue text-white rounded-lg hover:bg-light-blue transition-colors"
               >
                 {isScanning ? (
                   <>

@@ -22,13 +22,13 @@ const Layout: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-deep-purple/95 backdrop-blur-lg border-t border-white/10">
+      <nav className="fixed bottom-0 left-0 right-0 bg-deep-blue/95 backdrop-blur-lg border-t border-white/10">
         <div className="container mx-auto px-4">
           <div className="flex justify-around py-4">
             <Link
               to="/"
               className={`flex flex-col items-center space-y-1 transition-colors duration-200 ${
-                isActive('/') ? 'text-menu-active' : 'text-gray-400 hover:text-menu-hover'
+                isActive('/') ? 'text-menu-active' : 'text-gray-400 hover:text-light-blue'
               }`}
             >
               <HomeIcon className="w-6 h-6" />
@@ -38,7 +38,7 @@ const Layout: React.FC = () => {
             <Link
               to="/menu"
               className={`flex flex-col items-center space-y-1 transition-colors duration-200 ${
-                isActive('/menu') ? 'text-menu-active' : 'text-gray-400 hover:text-menu-hover'
+                isActive('/menu') ? 'text-menu-active' : 'text-gray-400 hover:text-light-blue'
               }`}
             >
               <QrCodeIcon className="w-6 h-6" />
@@ -48,7 +48,7 @@ const Layout: React.FC = () => {
             <Link
               to="/orders"
               className={`flex flex-col items-center space-y-1 transition-colors duration-200 ${
-                isActive('/orders') ? 'text-menu-active' : 'text-gray-400 hover:text-menu-hover'
+                isActive('/orders') ? 'text-menu-active' : 'text-gray-400 hover:text-light-blue'
               }`}
             >
               <ClipboardDocumentListIcon className="w-6 h-6" />
@@ -58,7 +58,7 @@ const Layout: React.FC = () => {
             <Link
               to="/profile"
               className={`flex flex-col items-center space-y-1 transition-colors duration-200 ${
-                isActive('/profile') ? 'text-menu-active' : 'text-gray-400 hover:text-menu-hover'
+                isActive('/profile') ? 'text-menu-active' : 'text-gray-400 hover:text-light-blue'
               }`}
             >
               <UserCircleIcon className="w-6 h-6" />

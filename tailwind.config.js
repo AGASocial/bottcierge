@@ -8,13 +8,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        'deep-purple': '#1A0B2E',
+        'deep-blue': '#1B2A4A',
+        'light-blue': '#69B7E3',
         'electric-blue': '#7B4DFF',
         'neon-pink': '#FF2EC4',
         'gold': '#FFD700',
         'silver': '#C0C0C0',
-        'menu-active': '#9F7AEA',
-        'menu-hover': '#B794F4'
+        'menu-active': '#69B7E3',
+        'menu-hover': '#1B2A4A'
       },
       animation: {
         'liquid': 'liquid 1.5s ease-in-out infinite',

@@ -11,10 +11,6 @@ import type { RootState } from '../store';
 const Profile: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Profile Header */}
@@ -24,8 +20,8 @@ const Profile: React.FC = () => {
             <UserCircleIcon className="w-12 h-12" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{user.name}</h1>
-            <p className="text-gray-300">{user.email}</p>
+            <h1 className="text-2xl font-bold">Jon Caines</h1>
+            <p className="text-gray-300">jon@bottcierge.ai</p>
           </div>
         </div>
       </div>

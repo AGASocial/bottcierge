@@ -45,14 +45,14 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-purple-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-deep-blue p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg"
       >
         <img className='mx-auto' src='/assets/images/logo.svg' width={100}></img>
-        <h2 className="text-3xl font-bold text-center mb-8 text-purple-600">
+        <h2 className="text-3xl font-bold text-center mb-8 text-light-blue">
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -66,7 +66,7 @@ const Auth: React.FC = () => {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-light-blue focus:ring-light-blue"
                 required
               />
             </div>
@@ -80,7 +80,7 @@ const Auth: React.FC = () => {
               id="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-light-blue focus:ring-light-blue"
               required
             />
           </div>
@@ -93,7 +93,7 @@ const Auth: React.FC = () => {
               id="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-light-blue focus:ring-light-blue"
               required
             />
           </div>
@@ -103,7 +103,7 @@ const Auth: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-deep-blue hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue disabled:opacity-50"
           >
             {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
@@ -111,7 +111,7 @@ const Auth: React.FC = () => {
         <div className="mt-6 text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-purple-600 hover:text-purple-500"
+            className="text-sm text-light-blue hover:text-deep-blue"
           >
             {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>

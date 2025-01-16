@@ -80,14 +80,14 @@ const Menu: React.FC = () => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => cartItem && handleRemoveFromCart(cartItem.id)}
-            className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+            className="p-1 rounded-full bg-light-blue hover:bg-deep-blue text-white"
           >
             <MinusIcon className="h-4 w-4" />
           </button>
-          <span className="text-purple-900 font-medium">{quantity}</span>
+          <span className="text-deep-blue font-medium">{quantity}</span>
           <button
             onClick={() => handleAddToCart(product)}
-            className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600"
+            className="p-1 rounded-full bg-light-blue hover:bg-deep-blue text-white"
           >
             <PlusIcon className="h-4 w-4" />
           </button>
@@ -100,7 +100,7 @@ const Menu: React.FC = () => {
         <select
           value={selectedSizes[product.id] || product.sizes[0].id}
           onChange={(e) => setSelectedSizes(prev => ({ ...prev, [product.id]: e.target.value }))}
-          className="block w-full px-2 py-1 text-sm rounded bg-purple-700 text-white border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="block w-full px-2 py-1 text-sm rounded bg-deep-blue text-white border border-light-blue focus:outline-none focus:ring-2 focus:ring-light-blue"
         >
           {product.sizes.map(size => (
             <option key={size.id} value={size.id}>
@@ -110,7 +110,7 @@ const Menu: React.FC = () => {
         </select>
         <button
           onClick={() => handleAddToCart(product)}
-          className="w-full px-3 py-1 rounded-full bg-purple-600 text-white text-sm hover:bg-purple-700"
+          className="w-full px-3 py-1 rounded-full bg-deep-blue text-white text-sm hover:bg-light-blue"
         >
           Add
         </button>
@@ -119,9 +119,9 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-purple-900">
+    <div className="min-h-screen bg-deep-blue">
       {/* Header */}
-      <div className="bg-purple-800 sticky top-0 z-10 shadow-lg">
+      <div className="bg-deep-blue sticky top-0 z-10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -136,17 +136,17 @@ const Menu: React.FC = () => {
                   placeholder="Search menu..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 pl-10 pr-4 py-2 rounded-full bg-purple-700 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-64 pl-10 pr-4 py-2 rounded-full bg-deep-blue text-white placeholder-light-blue focus:outline-none focus:ring-2 focus:ring-light-blue"
                 />
-                <MagnifyingGlassIcon className="h-5 w-5 text-purple-300 absolute left-3 top-2.5" />
+                <MagnifyingGlassIcon className="h-5 w-5 text-light-blue absolute left-3 top-2.5" />
               </div>
               <div
                 className="relative cursor-pointer"
                 onClick={() => navigate('/cart')}
               >
-                <ShoppingBagIcon className="h-6 w-6 text-white hover:text-purple-300 transition-colors" />
+                <ShoppingBagIcon className="h-6 w-6 text-white hover:text-light-blue transition-colors" />
                 {currentOrder && currentOrder.items.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-medium rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-light-blue text-white text-xs font-medium rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
                     {currentOrder.items.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -156,7 +156,7 @@ const Menu: React.FC = () => {
         </div>
 
         {/* Category Navigation */}
-        <div className="border-t border-purple-700">
+        <div className="border-t border-deep-blue">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex space-x-8 overflow-x-auto py-3 scrollbar-hide">
               {categories.map((category) => (
@@ -165,7 +165,7 @@ const Menu: React.FC = () => {
                   onClick={() => scrollToCategory(category.id)}
                   className={`text-sm font-medium whitespace-nowrap ${activeCategory === category.id
                     ? 'text-white'
-                    : 'text-purple-300 hover:text-white'
+                    : 'text-light-blue hover:text-white'
                     }`}
                 >
                   {category.name}
@@ -203,7 +203,7 @@ const Menu: React.FC = () => {
                     {categoryProducts.map((product) => (
                       <div
                         key={product.id}
-                        className="bg-purple-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-purple-700 transition-colors"
+                        className="bg-deep-blue rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-light-blue/20 transition-colors"
                         onClick={() => navigate(`/menu/${product.id}`)}
                       >
                         {product.image && (
@@ -221,13 +221,13 @@ const Menu: React.FC = () => {
                               <h3 className="text-lg font-medium text-white">
                                 {product.name}
                               </h3>
-                              <p className="text-sm text-purple-300 mt-1">
+                              <p className="text-sm text-light-blue mt-1">
                                 {product.description}
                               </p>
                               <div className="mt-2 space-y-1">
                                 {product.sizes.map(size => (
                                   <div key={size.id} className="flex justify-between text-sm">
-                                    <span className="text-purple-300">{size.name}</span>
+                                    <span className="text-light-blue">{size.name}</span>
                                     <span className="text-white">${size.currentPrice.toFixed(2)}</span>
                                   </div>
                                 ))}

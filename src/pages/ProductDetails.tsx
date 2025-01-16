@@ -64,7 +64,7 @@ const ProductDetails: React.FC = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-purple-900 p-4">
+      <div className="min-h-screen bg-deep-blue p-4">
         <div className="text-white text-center">Product not found</div>
       </div>
     );
@@ -102,17 +102,17 @@ const ProductDetails: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-purple-900 p-4">
+    <div className="min-h-screen bg-deep-blue p-4">
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => navigate('/menu')}
-          className="flex items-center text-white mb-6 hover:text-purple-300"
+          className="flex items-center text-white mb-6 hover:text-light-blue"
         >
           <ArrowLeftIcon className="h-5 w-5 mr-2" />
           Back to Menu
         </button>
 
-        <div className="bg-purple-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-deep-blue rounded-lg shadow-lg overflow-hidden">
           {product.image && (
             <img
               src={product.image}
@@ -123,7 +123,7 @@ const ProductDetails: React.FC = () => {
 
           <div className="p-6">
             <h1 className="text-2xl font-bold text-white mb-2">{product.name}</h1>
-            <p className="text-purple-300 mb-6">{product.description}</p>
+            <p className="text-light-blue mb-6">{product.description}</p>
 
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-white mb-3">Select Size</h2>
@@ -134,12 +134,12 @@ const ProductDetails: React.FC = () => {
                     onClick={() => setSelectedSize(size)}
                     className={`p-3 rounded-lg border-2 transition-colors ${
                       selectedSize?.id === size.id
-                        ? 'border-purple-500 bg-purple-700'
-                        : 'border-purple-600 hover:border-purple-500'
+                        ? 'border-light-blue bg-deep-blue'
+                        : 'border-deep-blue hover:border-light-blue'
                     }`}
                   >
                     <div className="text-white font-medium">{size.name}</div>
-                    <div className="text-purple-300">${size.currentPrice.toFixed(2)}</div>
+                    <div className="text-light-blue">${size.currentPrice.toFixed(2)}</div>
                   </button>
                 ))}
               </div>
@@ -159,8 +159,8 @@ const ProductDetails: React.FC = () => {
                           key={choice.id}
                           className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                             selectedOptions[option.id] === choice.id
-                              ? 'border-purple-500 bg-purple-700'
-                              : 'border-purple-600 hover:border-purple-500'
+                              ? 'border-light-blue bg-deep-blue'
+                              : 'border-deep-blue hover:border-light-blue'
                           }`}
                         >
                           <input
@@ -173,7 +173,7 @@ const ProductDetails: React.FC = () => {
                           />
                           <div className="text-white">{choice.name}</div>
                           {choice.price > 0 && (
-                            <div className="text-purple-300">+${choice.price.toFixed(2)}</div>
+                            <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
                           )}
                         </label>
                       ))}
@@ -186,8 +186,8 @@ const ProductDetails: React.FC = () => {
                           key={choice.id}
                           className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                             (selectedOptions[option.id] as string[] || []).includes(choice.id)
-                              ? 'border-purple-500 bg-purple-700'
-                              : 'border-purple-600 hover:border-purple-500'
+                              ? 'border-light-blue bg-deep-blue'
+                              : 'border-deep-blue hover:border-light-blue'
                           }`}
                         >
                           <input
@@ -205,7 +205,7 @@ const ProductDetails: React.FC = () => {
                           />
                           <div className="text-white">{choice.name}</div>
                           {choice.price > 0 && (
-                            <div className="text-purple-300">+${choice.price.toFixed(2)}</div>
+                            <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
                           )}
                         </label>
                       ))}
@@ -219,16 +219,16 @@ const ProductDetails: React.FC = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={!selectedSize || (customizationOptions.some(opt => opt.required && !selectedOptions[opt.id]))}
-                className="w-full py-3 px-4 bg-purple-600 text-white rounded-lg font-medium 
-                  hover:bg-purple-500 disabled:bg-purple-400 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-3 px-4 bg-deep-blue text-white rounded-lg font-medium 
+                  hover:bg-light-blue disabled:bg-deep-blue/50 disabled:cursor-not-allowed transition-colors"
               >
                 Add to Order
               </button>
             ) : (
               <button
                 onClick={() => navigate('/table/scan')}
-                className="w-full py-3 px-4 bg-purple-600 text-white rounded-lg font-medium 
-                  hover:bg-purple-500 transition-colors"
+                className="w-full py-3 px-4 bg-deep-blue text-white rounded-lg font-medium 
+                  hover:bg-light-blue transition-colors"
               >
                 Start New Order
               </button>
