@@ -9,6 +9,7 @@ import Cart from './pages/Cart';
 import Table from './pages/Table';
 import TableScan from './pages/TableScan';
 import Profile from './pages/Profile';
+import NightlifePreferences from './pages/NightlifePreferences';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
 import Receipt from './pages/Receipt';
@@ -44,6 +45,7 @@ function App() {
           <Route path="table/scan" element={<TableScan />} />
           <Route path="table/:tableId" element={<Table />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="preferences" element={<NightlifePreferences />} />
           <Route path="orders" element={<Orders />} />
           <Route path="payment" element={<Payment />} />
           <Route path="receipt" element={<Receipt />} />

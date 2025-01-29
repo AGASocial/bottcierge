@@ -1,15 +1,40 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
   UserCircleIcon,
   CreditCardIcon,
   BellIcon,
   CogIcon,
+  HeartIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
-import type { RootState } from '../store';
+import type { AppDispatch, RootState } from '../store';
+import { fetchProfile } from '../store/slices/profileSlice';
 
 const Profile: React.FC = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const { profile, preferences } = useSelector((state: RootState) => state.profile);
+
+  useEffect(() => {
+    dispatch(fetchProfile());
+  }, [dispatch]);
+
+  const getPreferencesSummary = () => {
+    if (!preferences) return [];
+    
+    const summary = [];
+    if (preferences.venues?.length > 0) {
+      summary.push(`${preferences.venues.length} venues`);
+    }
+    if (preferences.musicGenres?.length > 0) {
+      summary.push(`${preferences.musicGenres.length} music genres`);
+    }
+    if (preferences.events?.length > 0) {
+      summary.push(`${preferences.events.length} event types`);
+    }
+    return summary;
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -20,8 +45,8 @@ const Profile: React.FC = () => {
             <UserCircleIcon className="w-12 h-12" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Jon Caines</h1>
-            <p className="text-gray-300">jon@bottcierge.ai</p>
+            <h1 className="text-2xl font-bold">{profile?.name || 'Loading...'}</h1>
+            <p className="text-gray-300">{profile?.email}</p>
           </div>
         </div>
       </div>
@@ -35,20 +60,50 @@ const Profile: React.FC = () => {
             <button className="btn-secondary">Add New</button>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <CreditCardIcon className="w-6 h-6" />
-                <div>
-                  <p className="font-medium">•••• 4242</p>
-                  <p className="text-sm text-gray-300">Expires 12/24</p>
+            {profile?.paymentMethods?.map((method: any) => (
+              <div key={method.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <CreditCardIcon className="w-6 h-6" />
+                  <div>
+                    <p className="font-medium">•••• {method.last4}</p>
+                    <p className="text-sm text-gray-300">
+                      Expires {method.expiryMonth}/{method.expiryYear}
+                    </p>
+                  </div>
                 </div>
+                {method.isDefault && (
+                  <span className="px-3 py-1 bg-electric-blue/20 text-electric-blue rounded-full text-sm">
+                    Default
+                  </span>
+                )}
               </div>
-              <span className="px-3 py-1 bg-electric-blue/20 text-electric-blue rounded-full text-sm">
-                Default
-              </span>
-            </div>
+            ))}
           </div>
         </div>
+
+        {/* Nightlife Preferences Summary */}
+        <Link to="/preferences" className="block">
+          <div className="glass-card p-6 hover:bg-white/5 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-2">
+                  <HeartIcon className="w-6 h-6" />
+                  <h2 className="text-xl font-bold">Nightlife Preferences</h2>
+                </div>
+                {preferences ? (
+                  <p className="text-sm text-gray-300">
+                    {getPreferencesSummary().join(' • ')}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-300">
+                    Tell us about your perfect night out
+                  </p>
+                )}
+              </div>
+              <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+            </div>
+          </div>
+        </Link>
 
         {/* Notifications */}
         <div className="glass-card p-6">
