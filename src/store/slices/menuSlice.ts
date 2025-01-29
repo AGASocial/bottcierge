@@ -22,7 +22,7 @@ export const getCategories = createAsyncThunk(
   'menu/getCategories',
   async () => {
     const response = await api.get('/menu/categories');
-    return response.data.data;
+    return response.data.data.filter((b: any) => b.isActive);
   }
 );
 
