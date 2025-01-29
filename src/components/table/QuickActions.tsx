@@ -82,39 +82,53 @@ interface QuickActionsProps {
 const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.serviceRequest);
+  const { currentOrder } = useSelector((state: RootState) => state.order);
 
   const handleServiceRequest = async (type: string) => {
     await dispatch(createServiceRequest({ tableId, type }));
   };
+
+  // Check if there's an active order
+  const hasActiveOrder = currentOrder !== null && 
+    ['pending', 'preparing', 'ready', 'delivered'].includes(currentOrder.status);
 
   const quickActions = [
     {
       label: 'Call Server',
       onClick: () => handleServiceRequest('server'),
       icon: <UserIcon className="h-5 w-5" />,
+      alwaysShow: true,
     },
     {
       label: 'Refill Ice',
       onClick: () => handleServiceRequest('ice'),
       icon: <CubeIcon className="h-5 w-5" />,
+      alwaysShow: false,
     },
     {
       label: 'Request Mixers',
       onClick: () => handleServiceRequest('mixers'),
       icon: <BeakerIcon className="h-5 w-5" />,
+      alwaysShow: false,
     },
     {
       label: 'Need Assistance',
       onClick: () => handleServiceRequest('assistance'),
       icon: <QuestionMarkCircleIcon className="h-5 w-5" />,
+      alwaysShow: true,
     },
   ];
+
+  // Filter actions based on order status
+  const visibleActions = quickActions.filter(
+    action => action.alwaysShow || hasActiveOrder
+  );
 
   return (
     <div className="glass-card p-6">
       <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {quickActions.map((action) => (
+        {visibleActions.map((action) => (
           <QuickActionButton
             key={action.label}
             label={action.label}

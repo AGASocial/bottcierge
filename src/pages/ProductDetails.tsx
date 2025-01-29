@@ -135,95 +135,99 @@ const ProductDetails: React.FC = () => {
             <h1 className="text-2xl font-bold text-white mb-2">{product.name}</h1>
             <p className="text-light-blue mb-6">{product.description}</p>
 
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-white mb-3">Select Size</h2>
-              <div className="grid grid-cols-2 gap-3">
-                {product.sizes.map(size => (
-                  <button
-                    key={size.id}
-                    onClick={() => setSelectedSize(size.id)}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      selectedSize === size.id
-                        ? 'border-light-blue bg-deep-blue'
-                        : 'border-deep-blue hover:border-light-blue'
-                    }`}
-                  >
-                    <div className="text-white font-medium">{size.name}</div>
-                    <div className="text-light-blue">${size.currentPrice.toFixed(2)}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {customizationOptions.map(option => (
-              <div key={option.id} className="mb-6">
-                <h2 className="text-lg font-semibold text-white mb-3">
-                  {option.name}
-                  {option.required && <span className="text-red-400 ml-1">*</span>}
-                </h2>
-                <div className="space-y-2">
-                  {option.type === 'radio' && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {option.options.map(choice => (
-                        <label
-                          key={choice.id}
-                          className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                            selectedOptions[option.id] === choice.id
-                              ? 'border-light-blue bg-deep-blue'
-                              : 'border-deep-blue hover:border-light-blue'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name={option.id}
-                            value={choice.id}
-                            checked={selectedOptions[option.id] === choice.id}
-                            onChange={e => handleOptionChange(option.id, e.target.value)}
-                            className="sr-only"
-                          />
-                          <div className="text-white">{choice.name}</div>
-                          {choice.price > 0 && (
-                            <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
-                          )}
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                  {option.type === 'checkbox' && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {option.options.map(choice => (
-                        <label
-                          key={choice.id}
-                          className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                            (selectedOptions[option.id] as string[] || []).includes(choice.id)
-                              ? 'border-light-blue bg-deep-blue'
-                              : 'border-deep-blue hover:border-light-blue'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            value={choice.id}
-                            checked={(selectedOptions[option.id] as string[] || []).includes(choice.id)}
-                            onChange={e => {
-                              const currentValues = (selectedOptions[option.id] as string[] || []);
-                              const newValues = e.target.checked
-                                ? [...currentValues, choice.id]
-                                : currentValues.filter(id => id !== choice.id);
-                              handleOptionChange(option.id, newValues);
-                            }}
-                            className="sr-only"
-                          />
-                          <div className="text-white">{choice.name}</div>
-                          {choice.price > 0 && (
-                            <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
-                          )}
-                        </label>
-                      ))}
-                    </div>
-                  )}
+            {currentOrder && (
+              <>
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-white mb-3">Select Size</h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    {product.sizes.map(size => (
+                      <button
+                        key={size.id}
+                        onClick={() => setSelectedSize(size.id)}
+                        className={`p-3 rounded-lg border-2 transition-colors ${
+                          selectedSize === size.id
+                            ? 'border-light-blue bg-deep-blue'
+                            : 'border-deep-blue hover:border-light-blue'
+                        }`}
+                      >
+                        <div className="text-white font-medium">{size.name}</div>
+                        <div className="text-light-blue">${size.currentPrice.toFixed(2)}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+
+                {customizationOptions.map(option => (
+                  <div key={option.id} className="mb-6">
+                    <h2 className="text-lg font-semibold text-white mb-3">
+                      {option.name}
+                      {option.required && <span className="text-red-400 ml-1">*</span>}
+                    </h2>
+                    <div className="space-y-2">
+                      {option.type === 'radio' && (
+                        <div className="grid grid-cols-2 gap-3">
+                          {option.options.map(choice => (
+                            <label
+                              key={choice.id}
+                              className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                                selectedOptions[option.id] === choice.id
+                                  ? 'border-light-blue bg-deep-blue'
+                                  : 'border-deep-blue hover:border-light-blue'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name={option.id}
+                                value={choice.id}
+                                checked={selectedOptions[option.id] === choice.id}
+                                onChange={e => handleOptionChange(option.id, e.target.value)}
+                                className="sr-only"
+                              />
+                              <div className="text-white">{choice.name}</div>
+                              {choice.price > 0 && (
+                                <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
+                              )}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      {option.type === 'checkbox' && (
+                        <div className="grid grid-cols-2 gap-3">
+                          {option.options.map(choice => (
+                            <label
+                              key={choice.id}
+                              className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                                (selectedOptions[option.id] as string[] || []).includes(choice.id)
+                                  ? 'border-light-blue bg-deep-blue'
+                                  : 'border-deep-blue hover:border-light-blue'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                value={choice.id}
+                                checked={(selectedOptions[option.id] as string[] || []).includes(choice.id)}
+                                onChange={e => {
+                                  const currentValues = (selectedOptions[option.id] as string[] || []);
+                                  const newValues = e.target.checked
+                                    ? [...currentValues, choice.id]
+                                    : currentValues.filter(id => id !== choice.id);
+                                  handleOptionChange(option.id, newValues);
+                                }}
+                                className="sr-only"
+                              />
+                              <div className="text-white">{choice.name}</div>
+                              {choice.price > 0 && (
+                                <div className="text-light-blue">+${choice.price.toFixed(2)}</div>
+                              )}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
 
             {currentOrder ? (
               <button

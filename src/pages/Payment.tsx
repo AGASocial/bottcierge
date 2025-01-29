@@ -8,12 +8,14 @@ import { ArrowLeftIcon, CreditCardIcon, BanknotesIcon } from '@heroicons/react/2
 const Payment: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { currentOrder } = useSelector((state: RootState) => state.order);
+  const { currentOrder, error: orderError } = useSelector((state: RootState) => state.order);
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'cash'>('card');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleMethodChange = (method: 'card' | 'cash') => {
     setSelectedMethod(method);
+    setError(null);
   };
 
   // Redirect to cart if no order exists
@@ -46,13 +48,37 @@ const Payment: React.FC = () => {
   const handlePayment = async () => {
     try {
       setLoading(true);
-      await dispatch(processPayment({
+      setError(null);
+
+      const result = await dispatch(processPayment({
         method: selectedMethod,
         amount: calculateTotal(),
       })).unwrap();
-      navigate('/receipt', { state: { total: calculateTotal(), method: selectedMethod } });
+
+      navigate('/receipt', { 
+        state: { 
+          success: result.success,
+          total: calculateTotal(), 
+          method: selectedMethod,
+          transactionId: result.transactionId,
+          timestamp: result.timestamp,
+          orderId: currentOrder.id,
+          items: currentOrder.items,
+          error: result.success ? null : 'Payment processing failed'
+        } 
+      });
     } catch (error) {
-      console.error('Payment failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
+      navigate('/receipt', {
+        state: {
+          success: false,
+          total: calculateTotal(),
+          method: selectedMethod,
+          error: errorMessage,
+          orderId: currentOrder.id,
+          items: currentOrder.items
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -71,6 +97,12 @@ const Payment: React.FC = () => {
             </button>
             <h1 className="text-2xl font-bold text-white">Payment</h1>
           </div>
+
+          {(error || orderError) && (
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
+              {error || orderError}
+            </div>
+          )}
 
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/20">
@@ -110,30 +142,30 @@ const Payment: React.FC = () => {
 
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/20">
               <h2 className="text-lg font-semibold text-white mb-4">Order Summary</h2>
-              <div className="space-y-2">
-                <div className="flex justify-between text-white">
+              <div className="space-y-2 text-white">
+                <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>${calculateSubtotal().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-white">
-                  <span>Tax</span>
+                <div className="flex justify-between">
+                  <span>Tax (18%)</span>
                   <span>${calculateTax().toFixed(2)}</span>
                 </div>
-                <div className="border-t border-white/10 pt-2 mt-2">
-                  <div className="flex justify-between font-semibold text-white">
-                    <span>Total</span>
-                    <span>${calculateTotal().toFixed(2)}</span>
-                  </div>
+                <div className="flex justify-between font-semibold text-lg mt-4 pt-4 border-t border-white/20">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handlePayment}
-              disabled={!selectedMethod}
-              className="w-full py-3 bg-white/5 border border-white/20 text-white rounded-lg hover:bg-light-blue disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-white/20 rounded-md shadow-sm text-sm font-medium text-white
+                ${loading ? 'bg-white/20 cursor-not-allowed' : 'bg-white/5 hover:bg-light-blue'}
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue`}
             >
-              {loading ? 'Processing...' : 'Complete Payment'}
+              {loading ? 'Processing Payment...' : 'Complete Payment'}
             </button>
           </div>
         </div>

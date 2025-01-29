@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { paymentService } from '../../services/paymentService';
 import type { Order, OrderItem, OrderStatus } from '../../types';
+import type { RootState } from '../index';
 
 interface OrderState {
   currentOrder: Order | null;
@@ -65,12 +67,44 @@ export const removeItemFromOrder = createAsyncThunk(
   }
 );
 
+export const updateOrder = createAsyncThunk(
+  'order/updateOrder',
+  async (orderData: Partial<Order>) => {
+    const response = await api.put(`/orders/${orderData.id}`, orderData);
+    return response.data;
+  }
+);
+
 export const processPayment = createAsyncThunk(
   'order/processPayment',
-  async ({ method, amount }: { method: 'card' | 'cash'; amount: number }) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true };
+  async (paymentDetails: { method: 'card' | 'cash'; amount: number }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const { currentOrder } = state.order;
+
+      if (!currentOrder) {
+        throw new Error('No active order found');
+      }
+
+      const paymentRequest = {
+        orderId: currentOrder.id,
+        method: paymentDetails.method,
+        amount: paymentDetails.amount,
+      };
+
+      const response = await paymentService.processPayment(paymentRequest);
+
+      if (!response.success) {
+        throw new Error('Payment failed');
+      }
+
+      return response;
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Payment processing failed');
+    }
   }
 );
 
@@ -136,6 +170,19 @@ const orderSlice = createSlice({
           state.orderHistory.unshift(action.payload);
           state.currentOrder = null;
         }
+      })
+      // Update order
+      .addCase(updateOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentOrder = action.payload;
+      })
+      .addCase(updateOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update order';
       })
       // Add item to order
       .addCase(addItemToOrder.fulfilled, (state, action) => {

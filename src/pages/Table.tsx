@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,12 +18,14 @@ import { useNavigate } from 'react-router-dom';
 const Table: React.FC = () => {
   const { tableId } = useParams<{ tableId: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+
   const { selectedTable: currentTable, qrScanning } = useSelector(
     (state: RootState) => state.table
   );
   const { currentVenue } = useSelector((state: RootState) => state.venue);
-  const { currentOrder } = useSelector((state: RootState) => state.order);
-  const navigate = useNavigate();
+  const { currentOrder, loading: orderLoading, error: orderError } = useSelector((state: RootState) => state.order);
 
   useEffect(() => {
     if (tableId) {
@@ -32,14 +34,30 @@ const Table: React.FC = () => {
   }, [dispatch, tableId]);
 
   const handleStartOrder = async () => {
+    console.log('Handling start order', currentTable );
+    console.log('Handling start order',  currentVenue);
     if (!currentTable || !currentVenue) return;
+    
+    try {
+      setIsCreatingOrder(true);
+      const result = await dispatch(createOrder({
+        venueId: currentVenue.id,
+        tableId: currentTable.id,
+        type: 'regular'
+      })).unwrap();
+      
+      // Only navigate if the order was created successfully
+      if (result) {
+        navigate('/menu');
+      }
+    } catch (error) {
+      console.error('Failed to create order:', error);
+    } finally {
+      setIsCreatingOrder(false);
+    }
+  };
 
-    await dispatch(createOrder({
-      venueId: currentVenue.id,
-      tableId: currentTable.id,
-      type: 'regular'
-    }));
-
+  const handleAddMoreItems = () => {
     navigate('/menu');
   };
 
@@ -66,10 +84,18 @@ const Table: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  const canStartOrder = !isCreatingOrder && !currentOrder;
+
   return (
     <div className="min-h-screen bg-deep-blue">
       <div className="container mx-auto px-4 py-8 text-white">
         <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 border border-white/20">
+          {orderError && (
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
+              {orderError}
+            </div>
+          )}
+          
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold mb-2">Table {currentTable?.number}</h1>
@@ -77,13 +103,6 @@ const Table: React.FC = () => {
               {renderTableStatus(currentTable)}
             </div>
             <div className="flex space-x-4">
-              <button
-                onClick={() => dispatch(setQRScanning(true))}
-                className="inline-flex items-center px-4 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-md text-white bg-white/5 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
-              >
-                <QrCodeIcon className="h-5 w-5 mr-2" />
-                Scan QR
-              </button>
               <button
                 onClick={() => navigate('/cart')}
                 className="inline-flex items-center px-4 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-md text-white bg-white/5 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
@@ -118,12 +137,25 @@ const Table: React.FC = () => {
           </div>
 
           <div className="mt-6">
-            <button
-              onClick={handleStartOrder}
-              className="w-full flex justify-center py-3 px-4 border border-white/20 rounded-md shadow-sm text-sm font-medium text-white bg-white/5 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
-            >
-              Start Order
-            </button>
+            {canStartOrder ? (
+              <button
+                onClick={handleStartOrder}
+                disabled={isCreatingOrder}
+                className={`w-full flex justify-center py-3 px-4 border border-white/20 rounded-md shadow-sm text-sm font-medium text-white 
+                  ${isCreatingOrder ? 'bg-white/20 cursor-not-allowed' : 'bg-white/5 hover:bg-light-blue'} 
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue`}
+              >
+                {isCreatingOrder ? 'Creating Order...' : 'Start Order'}
+              </button>
+            ) : currentOrder ? (
+              <button
+                onClick={handleAddMoreItems}
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-white/5 hover:bg-light-blue rounded-md 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
+              >
+                Add more items
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

@@ -1,21 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClockIcon } from '@heroicons/react/24/outline';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../store';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
 import type { Order, OrderItem, OrderStatus } from '../types';
+import { getOrders } from '../store/slices/orderSlice';
 
 const Orders: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const orders = useSelector((state: RootState) => state.order.orderHistory) || [];
 
+  useEffect(() => {
+    dispatch(getOrders());
+  }, [dispatch]);
+
   const statusColors: Record<OrderStatus, string> = {
-    pending: 'bg-yellow-500',
-    preparing: 'bg-light-blue',
-    ready: 'bg-green-500',
-    delivered: 'bg-gray-500',
-    completed: 'bg-gray-500',
-    cancelled: 'bg-red-500'
+    draft: 'bg-amber-500',           // Warm yellow for draft
+    paid: 'bg-electric-blue',        // Our custom electric blue for paid
+    accepted: 'bg-violet-500',       // Purple for accepted
+    preparing: 'bg-light-blue',      // Our custom light blue for preparing
+    serving: 'bg-orange-500',        // Orange for active serving
+    completed: 'bg-emerald-500',     // Bright green for completion
+    cancelled: 'bg-rose-500'         // Red for cancelled
   };
 
   return (
@@ -91,6 +98,18 @@ const Orders: React.FC = () => {
                       </div>
                     ))}
                   </div>
+
+                  {order.status === 'draft' && (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => navigate('/payment')}
+                        className="w-full px-4 py-2 text-sm font-medium text-white bg-electric-blue hover:bg-light-blue rounded-md 
+                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue transition-colors duration-200"
+                      >
+                        Go to Payment
+                      </button>
+                    </div>
+                  )}
 
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <div className="flex justify-between text-white">

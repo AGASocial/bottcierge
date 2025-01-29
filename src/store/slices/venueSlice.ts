@@ -3,6 +3,33 @@ import api from '../../services/api';
 import axios from 'axios';
 import type { Venue, Staff, Section, VenueEvent, PricingRule } from '../../types';
 
+const defaultVenue: Venue = {
+  id: 'default-venue',
+  name: 'The Purple Lounge',
+  address: '123 Main St',
+  city: 'Austin',
+  state: 'TX',
+  zipCode: '78701',
+  phone: '(512) 555-0123',
+  email: 'info@purplelounge.com',
+  description: 'A sophisticated nightclub in downtown Austin',
+  openingHours: {
+    monday: '18:00-02:00',
+    tuesday: '18:00-02:00',
+    wednesday: '18:00-02:00',
+    thursday: '18:00-02:00',
+    friday: '18:00-03:00',
+    saturday: '18:00-03:00',
+    sunday: '18:00-02:00'
+  },
+  status: 'open',
+  type: 'nightclub',
+  capacity: 300,
+  sections: ['main-floor', 'vip-area', 'rooftop'],
+  amenities: ['vip-service', 'dance-floor', 'smoking-area'],
+  rating: 4.5
+};
+
 interface VenueState {
   currentVenue: Venue | null;
   staff: Staff[];
@@ -27,7 +54,7 @@ interface VenueState {
 }
 
 const initialState: VenueState = {
-  currentVenue: null,
+  currentVenue: defaultVenue,
   staff: [],
   sections: [],
   events: [],

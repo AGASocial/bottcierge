@@ -48,7 +48,14 @@ export interface OrderItem {
   status: 'pending' | 'preparing' | 'ready' | 'delivered';
 }
 
-export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled';
+export type OrderStatus = 
+  | 'draft'      // Initial state when user is adding items
+  | 'paid'       // Payment has been processed successfully
+  | 'accepted'   // Club has acknowledged the order
+  | 'preparing'  // Club is preparing the drinks/items
+  | 'serving'    // Order is being served/delivered to the table
+  | 'completed'  // Order has been delivered and completed
+  | 'cancelled'; // Order has been cancelled (can happen at any point)
 
 export interface Order {
   id: string;

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from './api';
 
 interface CreditCardInfo {
   number: string;
@@ -17,14 +18,23 @@ interface BillingAddress {
 }
 
 interface PaymentRequest {
-  token: string;
+  orderId: string;
+  method: 'card' | 'cash';
   amount: number;
-  orderNumber: string;
+  tip?: number;
+  token?: string;
+}
+
+interface PaymentResponse {
+  success: boolean;
+  orderId: string;
+  transactionId: string;
+  paymentStatus: 'completed' | 'failed';
+  timestamp: string;
 }
 
 class PaymentService {
   private static instance: PaymentService;
-  private baseUrl: string = '/api/payments';
 
   private constructor() {}
 
@@ -40,76 +50,34 @@ class PaymentService {
     billingAddress: BillingAddress
   ): Promise<string> {
     try {
-      const response = await axios.post(`${this.baseUrl}/authorize`, {
-        card: {
-          number: cardInfo.number,
-          expiryMonth: cardInfo.expiryMonth,
-          expiryYear: cardInfo.expiryYear,
-          cvv: cardInfo.cvv,
-          name: cardInfo.name,
-        },
-        billing: billingAddress,
+      const response = await api.post('/payment/validate', {
+        cardInfo,
+        billingAddress,
       });
-
       return response.data.token;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to validate credit card');
+    } catch (error) {
+      throw new Error('Credit card validation failed');
     }
   }
 
-  public async processPayment(paymentRequest: PaymentRequest): Promise<any> {
+  public async processPayment(paymentRequest: PaymentRequest): Promise<PaymentResponse> {
     try {
-      const response = await axios.post(`${this.baseUrl}/charge`, paymentRequest);
+      const response = await api.post('/payment/process', paymentRequest);
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Payment processing failed');
+    } catch (error) {
+      throw new Error('Payment processing failed');
     }
   }
 
-  // Helper method to format credit card number with spaces
-  public formatCardNumber(number: string): string {
-    return number.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-  }
-
-  // Helper method to validate credit card number using Luhn algorithm
-  public validateCardNumber(number: string): boolean {
-    const digits = number.replace(/\D/g, '');
-    
-    if (digits.length < 13 || digits.length > 19) return false;
-
-    let sum = 0;
-    let isEven = false;
-
-    for (let i = digits.length - 1; i >= 0; i--) {
-      let digit = parseInt(digits[i]);
-
-      if (isEven) {
-        digit *= 2;
-        if (digit > 9) {
-          digit -= 9;
-        }
-      }
-
-      sum += digit;
-      isEven = !isEven;
+  public async getPaymentStatus(orderId: string): Promise<PaymentResponse> {
+    try {
+      const response = await api.get(`/payment/status/${orderId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to get payment status');
     }
-
-    return sum % 10 === 0;
-  }
-
-  // Helper method to validate expiry date
-  public validateExpiry(month: string, year: string): boolean {
-    const currentDate = new Date();
-    const expiry = new Date(parseInt(year), parseInt(month) - 1);
-    return expiry > currentDate;
-  }
-
-  // Helper method to validate CVV
-  public validateCVV(cvv: string): boolean {
-    const cvvRegex = /^\d{3,4}$/;
-    return cvvRegex.test(cvv);
   }
 }
 
 export const paymentService = PaymentService.getInstance();
-export type { CreditCardInfo, BillingAddress, PaymentRequest };
+export type { CreditCardInfo, BillingAddress, PaymentRequest, PaymentResponse };
