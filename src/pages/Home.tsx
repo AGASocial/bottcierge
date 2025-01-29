@@ -110,19 +110,19 @@ const Home: React.FC = () => {
             onClick={() => handleRefill('Ice is on the way!')}
             className="btn-secondary"
           >
-            Refill ice
+            Refill Ice
           </button>
           <button
             onClick={() => handleRefill('Mixers are on the way!')}
             className="btn-secondary"
           >
-            Refill mixers
+            Refill Mixers
           </button>
           <button
             onClick={() => handleRefill('Ice & mixers are on the way!')}
             className="btn-secondary"
           >
-            Refill ice & mixers
+            Refill Ice & Mixers
           </button>
         </div>
       </div>

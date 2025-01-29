@@ -11,6 +11,7 @@ import { getTableById, setQRScanning } from '../store/slices/tableSlice';
 import { createOrder } from '../store/slices/orderSlice';
 import QRScanner from '../components/scanner/QRScanner';
 import Cart from '../components/cart/Cart';
+import QuickActions from '../components/table/QuickActions';
 import type { AppDispatch, RootState } from '../store';
 import { useNavigate } from 'react-router-dom';
 
@@ -111,6 +112,9 @@ const Table: React.FC = () => {
                 )}
               </div>
             </div>
+            
+            {/* Add QuickActions component */}
+            <QuickActions tableId={currentTable.id} />
           </div>
 
           <div className="mt-6">
