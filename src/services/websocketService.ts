@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { AppDispatch } from '../store';
 import { updateOrderStatusSocket } from '../store/slices/orderSlice';
-import { OrderStatus } from '../types';
+import { Order, OrderStatus } from '../types';
 
 type OrderStatusUpdate = {
   orderId: string;
@@ -56,7 +56,7 @@ class WebSocketService {
       console.log('Received all orders update:', orders);
       if (this.dispatch) {
         // Update each order in the store
-        orders.forEach(order => {
+        orders.forEach((order: Order) => {
           this.dispatch!(updateOrderStatusSocket({
             orderId: order.id,
             status: order.status

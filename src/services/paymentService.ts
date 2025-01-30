@@ -77,6 +77,42 @@ class PaymentService {
       throw new Error('Failed to get payment status');
     }
   }
+
+  formatCardNumber(cardNumber: string): string {
+    // Remove any non-digit characters
+    const cleaned = cardNumber.replace(/\D/g, '');
+    // Add space after every 4 digits
+    const formatted = cleaned.replace(/(\d{4})(?=\d)/g, '$1 ');
+    // Limit to 19 characters (16 digits + 3 spaces)
+    return formatted.slice(0, 19);
+  }
+
+  validateCardNumber(cardNumber: string): boolean {
+    const cleaned = cardNumber.replace(/\D/g, '');
+    return cleaned.length === 16 && /^\d+$/.test(cleaned);
+  }
+
+  validateExpiry(month: string, year: string): boolean {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+    
+    const expMonth = parseInt(month, 10);
+    const expYear = parseInt(year, 10);
+    
+    if (isNaN(expMonth) || isNaN(expYear)) return false;
+    if (expMonth < 1 || expMonth > 12) return false;
+    
+    if (expYear < currentYear) return false;
+    if (expYear === currentYear && expMonth < currentMonth) return false;
+    
+    return true;
+  }
+
+  validateCVV(cvv: string): boolean {
+    const cleaned = cvv.replace(/\D/g, '');
+    return cleaned.length >= 3 && cleaned.length <= 4 && /^\d+$/.test(cleaned);
+  }
 }
 
 export const paymentService = PaymentService.getInstance();

@@ -116,7 +116,11 @@ const NightlifePreferences: React.FC = () => {
             <PreferencesSection
               title={formatCategoryTitle(category)}
               options={options}
-              selected={localPreferences?.[category as keyof NightlifePreferencesType] || []}
+              selected={
+                category === 'spendingRange'
+                  ? (localPreferences?.[category as keyof NightlifePreferencesType] as { min: number; max: number })
+                  : (localPreferences?.[category as keyof NightlifePreferencesType] as string[]) || []
+              }
               onChange={(values) =>
                 handlePreferenceChange(
                   category as keyof NightlifePreferencesType,
