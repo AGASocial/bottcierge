@@ -136,27 +136,15 @@ const orderSlice = createSlice({
     },
     updateOrderStatusSocket: (state, action) => {
       const { orderId, status } = action.payload;
-      console.log('Updating order status in Redux:', { orderId, status });
-
-      // Update in orderHistory
-      const orderIndex = state.orderHistory.findIndex(order => order.id === orderId);
-      if (orderIndex !== -1) {
-        console.log('Found order in history, updating status');
-        state.orderHistory[orderIndex] = {
-          ...state.orderHistory[orderIndex],
-          status: status as OrderStatus
-        };
-      } else {
-        console.log('Order not found in history:', orderId);
-      }
-
-      // Update currentOrder if it matches
+      
+      // Update in order history
+      state.orderHistory = state.orderHistory.map(order =>
+        order.id === orderId ? { ...order, status } : order
+      );
+      
+      // Update current order if it matches
       if (state.currentOrder && state.currentOrder.id === orderId) {
-        console.log('Updating current order status');
-        state.currentOrder = {
-          ...state.currentOrder,
-          status: status as OrderStatus
-        };
+        state.currentOrder = { ...state.currentOrder, status };
       }
     }
   },

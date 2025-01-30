@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { QrCodeIcon, ClipboardDocumentListIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import type { RootState } from '../store';
 import { getProducts } from '../store/slices/menuSlice';
-import { getOrders } from '@/store/slices/orderSlice';
+import { getOrders, updateOrderStatusSocket } from '@/store/slices/orderSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import toast, { Toaster } from 'react-hot-toast';
@@ -29,6 +29,36 @@ const Home: React.FC = () => {
     // Initialize WebSocket connection
     websocketService.initialize(dispatch);
 
+    // Subscribe to all orders for real-time updates
+    websocketService.subscribeToAllOrders();
+
+    // Listen for individual order status updates
+    websocketService.onOrderStatusUpdate((update) => {
+      // Update the order in Redux store
+      dispatch(updateOrderStatusSocket(update));
+      
+      // Show toast notification for status change
+      // const statusMessages: { [key: string]: string } = {
+      //   accepted: 'Your order has been accepted! 🎉',
+      //   preparing: 'Your order is being prepared! 👨‍🍳',
+      //   serving: 'Your order is on its way! 🏃‍♂️',
+      //   completed: 'Your order has been delivered! ✅',
+      //   cancelled: 'Your order has been cancelled. 😢'
+      // };
+
+      // const message = statusMessages[update.status.toLowerCase()];
+      // if (message) {
+      //   toast.success(message, {
+      //     duration: 4000,
+      //     style: {
+      //       background: '#dedede',
+      //       color: '#000',
+      //       borderRadius: '10px',
+      //     },
+      //   });
+      // }
+    });
+
     return () => {
       websocketService.cleanup();
     };
@@ -40,10 +70,17 @@ const Home: React.FC = () => {
 
     // Subscribe to updates for all active orders
     orderHistory.forEach(order => {
-      if (['paid', 'accepted','preparing', 'ready', 'serving'].includes(order.status.toLowerCase())) {
+      if (['paid', 'accepted', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())) {
         websocketService.subscribeToOrder(order.id);
       }
     });
+
+    // Cleanup function to unsubscribe from orders
+    return () => {
+      orderHistory.forEach(order => {
+        websocketService.unsubscribeFromOrder(order.id);
+      });
+    };
   }, [orderHistory]);
 
   // Get 3 random products for featured section
@@ -119,18 +156,17 @@ const Home: React.FC = () => {
             <ClipboardDocumentListIcon className="w-8 h-8 text-neon-pink" />
             <h2 className="text-xl font-bold">View Orders</h2>
           </div>
-          {orderHistory?.filter(order => 
+          {orderHistory?.filter(order =>
             ['paid', 'accepted', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())
           ).map(order => (
             <div key={order.id} className="mb-3 p-3 rounded-lg bg-black/30 border border-white/10">
               <div className="flex justify-between items-center">
                 <span className="font-medium">#{order.orderNumber}</span>
-                <span className={`px-2 py-1 rounded text-sm ${
-                  order.status.toLowerCase() === 'paid' ? 'bg-blue-500/20 text-blue-300' :
+                <span className={`px-2 py-1 rounded text-sm ${order.status.toLowerCase() === 'paid' ? 'bg-blue-500/20 text-blue-300' :
                   order.status.toLowerCase() === 'preparing' ? 'bg-yellow-500/20 text-yellow-300' :
-                  order.status.toLowerCase() === 'ready' ? 'bg-green-500/20 text-green-300' :
-                  'bg-purple-500/20 text-purple-300'
-                }`}>
+                    order.status.toLowerCase() === 'ready' ? 'bg-green-500/20 text-green-300' :
+                      'bg-purple-500/20 text-purple-300'
+                  }`}>
                   {order.status}
                 </span>
               </div>

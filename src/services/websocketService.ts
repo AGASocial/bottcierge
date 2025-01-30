@@ -1,6 +1,14 @@
 import { io, Socket } from 'socket.io-client';
 import { AppDispatch } from '../store';
 import { updateOrderStatusSocket } from '../store/slices/orderSlice';
+import { OrderStatus } from '../types';
+
+type OrderStatusUpdate = {
+  orderId: string;
+  status: OrderStatus;
+};
+
+type OrderStatusUpdateCallback = (update: OrderStatusUpdate) => void;
 
 class WebSocketService {
   private socket: Socket | null = null;
@@ -8,6 +16,8 @@ class WebSocketService {
   private isInitialized = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private subscribedOrders: Set<string> = new Set();
+  private statusUpdateCallbacks: Set<OrderStatusUpdateCallback> = new Set();
 
   initialize(dispatch: AppDispatch) {
     if (this.isInitialized) {
@@ -18,7 +28,7 @@ class WebSocketService {
     this.isInitialized = true;
     
     // Connect to the WebSocket server
-    this.socket = io(import.meta.env.VITE_WS_URL || 'http://localhost:3002', {
+    this.socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
       transports: ['websocket'],
       autoConnect: true,
       reconnection: true,
@@ -29,13 +39,29 @@ class WebSocketService {
     });
 
     // Listen for order status updates
-    this.socket.on('orderStatusUpdate', (data: { orderId: string; status: string }) => {
-      console.log('Received order status update:', data);
+    this.socket.on('orderStatusUpdate', (update: OrderStatusUpdate) => {
+      console.log('Received order status update4:', update);
       if (this.dispatch) {
         console.log('Dispatching order status update to Redux');
-        this.dispatch(updateOrderStatusSocket(data));
+        this.dispatch(updateOrderStatusSocket(update));
       } else {
         console.error('Dispatch not available for order status update');
+      }
+      // Notify all callbacks
+      this.statusUpdateCallbacks.forEach(callback => callback(update));
+    });
+
+    // Listen for all orders updates
+    this.socket.on('allOrders', ({ orders }) => {
+      console.log('Received all orders update:', orders);
+      if (this.dispatch) {
+        // Update each order in the store
+        orders.forEach(order => {
+          this.dispatch!(updateOrderStatusSocket({
+            orderId: order.id,
+            status: order.status
+          }));
+        });
       }
     });
 
@@ -43,53 +69,105 @@ class WebSocketService {
     this.socket.on('connect', () => {
       console.log('WebSocket connected');
       this.reconnectAttempts = 0;
-    });
-
-    this.socket.on('connected', () => {
-      console.log('Server confirmed connection');
+      
+      // Resubscribe to orders after reconnection
+      this.subscribedOrders.forEach(orderId => {
+        this.subscribeToOrder(orderId);
+      });
     });
 
     this.socket.on('disconnect', () => {
       console.log('WebSocket disconnected');
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
-      this.reconnectAttempts++;
-      
-      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.error('Max reconnection attempts reached');
-        this.cleanup();
-      }
+    this.socket.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      this.handleReconnect();
     });
   }
 
-  // Clean up method
+  onOrderStatusUpdate(callback: OrderStatusUpdateCallback) {
+    if (this.socket) {
+      this.socket.on('orderStatusUpdate', callback);
+      this.statusUpdateCallbacks.add(callback);
+    }
+  }
+
+  subscribeToOrder(orderId: string) {
+    if (this.socket) {
+      console.log('Subscribing to order:', orderId);
+      this.socket.emit('subscribeToOrder', { orderId });
+      this.subscribedOrders.add(orderId);
+    }
+  }
+
+  unsubscribeFromOrder(orderId: string) {
+    if (this.socket) {
+      console.log('Unsubscribing from order:', orderId);
+      this.socket.emit('unsubscribeFromOrder', { orderId });
+      this.subscribedOrders.delete(orderId);
+    }
+  }
+
+  subscribeToAllOrders() {
+    if (!this.socket?.connected) {
+      console.error('Socket not connected');
+      return;
+    }
+
+    console.log('Subscribing to all orders');
+    this.socket.emit('subscribeToAllOrders');
+  }
+
+  unsubscribeFromAllOrders() {
+    if (!this.socket?.connected) {
+      console.error('Socket not connected');
+      return;
+    }
+
+    console.log('Unsubscribing from all orders');
+    this.socket.emit('unsubscribeFromAllOrders');
+  }
+
+  subscribeToNewOrders() {
+    if (this.socket) {
+      console.log('Subscribing to new orders');
+      this.socket.emit('subscribeToNewOrders');
+    }
+  }
+
+  onNewOrder(callback: (order: any) => void) {
+    if (this.socket) {
+      this.socket.on('newOrder', callback);
+    }
+  }
+
+  private handleReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      setTimeout(() => {
+        console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+        this.socket?.connect();
+      }, 1000 * this.reconnectAttempts);
+    }
+  }
+
   cleanup() {
     if (this.socket) {
-      // Remove all listeners before disconnecting
-      this.socket.removeAllListeners();
+      // Unsubscribe from all orders
+      this.unsubscribeFromAllOrders();
+      
+      // Unsubscribe from individual orders
+      this.subscribedOrders.forEach(orderId => {
+        this.unsubscribeFromOrder(orderId);
+      });
+      
       this.socket.disconnect();
       this.socket = null;
-    }
-    this.isInitialized = false;
-    this.dispatch = null;
-    this.reconnectAttempts = 0;
-  }
-
-  // Subscribe to specific order updates
-  subscribeToOrder(orderId: string) {
-    if (this.socket?.connected) {
-      console.log('Subscribing to order updates for order ID:', orderId);
-      this.socket.emit('subscribeToOrder', { orderId });
-    }
-  }
-
-  // Unsubscribe from specific order updates
-  unsubscribeFromOrder(orderId: string) {
-    if (this.socket?.connected) {
-      console.log('Unsubscribing from order updates for order ID:', orderId);
-      this.socket.emit('unsubscribeFromOrder', { orderId });
+      this.isInitialized = false;
+      this.dispatch = null;
+      this.subscribedOrders.clear();
+      this.statusUpdateCallbacks.clear();
     }
   }
 }
