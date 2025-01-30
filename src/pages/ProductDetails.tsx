@@ -122,7 +122,7 @@ const ProductDetails: React.FC = () => {
           Back to Menu
         </button>
 
-        <div className="bg-deep-blue rounded-lg shadow-lg overflow-hidden">
+        <div className={`${currentOrder ? 'bg-deep-blue' : 'bg-sky-500/25'} rounded-lg shadow-lg overflow-hidden`}>
           {product.image && (
             <img
               src={product.image}

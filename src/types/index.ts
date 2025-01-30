@@ -48,7 +48,7 @@ export interface OrderItem {
   status: 'pending' | 'preparing' | 'ready' | 'delivered';
 }
 
-export type OrderStatus = 
+export type OrderStatus =
   | 'draft'      // Initial state when user is adding items
   | 'paid'       // Payment has been processed successfully
   | 'accepted'   // Club has acknowledged the order
@@ -128,8 +128,23 @@ export interface Venue {
   name: string;
   address: string;
   description: string;
+  email?: string;
+  openingHours?: OperatingHours[];
   image?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phoneNumber: string;
+  timezone: string;
+  taxRate: number;
+  status: 'open' | 'active' | 'closed' | 'special_event';
+  type: 'bar' | 'restaurant' | 'cafe' | 'nightclub';
+  capacity: number;
+  operatingHours: OperatingHours[];
+  sections: Section[];
+  amenities: string[];
   tables: Table[];
+  rating: number;
 }
 
 export interface VenueLocation {

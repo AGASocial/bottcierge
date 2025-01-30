@@ -208,7 +208,7 @@ const Menu: React.FC = () => {
                     {categoryProducts.map((product) => (
                       <div
                         key={product.id}
-                        className="bg-deep-blue rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-light-blue/20 transition-colors"
+                        className="bg-sky-500/25 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-light-blue/20 transition-colors"
                         onClick={() => navigate(`/menu/${product.id}`)}
                       >
                         {product.image && (

@@ -133,43 +133,49 @@ const Home: React.FC = () => {
       {/* Featured Drinks */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-white mb-6">Featured Drinks</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                className="bg-sky-500/25 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-light-blue/20 transition-colors"
+                onClick={() => navigate(`/menu/${product.id}`)}
               >
                 {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
+                  <div className="aspect-w-16 aspect-h-9">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
                 )}
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {product.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-purple-600 font-semibold">
-                      ${product.sizes[0].currentPrice.toFixed(2)}
-                    </span>
-                    <button
-                      onClick={() => navigate('/menu')}
-                      className="text-purple-600 hover:text-purple-700"
-                    >
-                      <ArrowRightIcon className="h-5 w-5" />
-                    </button>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-medium text-white">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-light-blue mt-1">
+                        {product.description}
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {product.sizes.map(size => (
+                          <div key={size.id} className="flex justify-between text-sm">
+                            <span className="text-light-blue">{size.name}</span>
+                            <span className="text-white">${size.currentPrice?.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))
           ) : (
-            <div className="col-span-3 text-center text-purple-200 py-8">
+            <div className="col-span-3 text-center text-light-blue py-8">
               Loading featured drinks...
             </div>
           )}

@@ -10,24 +10,27 @@ const defaultVenue: Venue = {
   city: 'Austin',
   state: 'TX',
   zipCode: '78701',
-  phone: '(512) 555-0123',
+  phoneNumber: '(512) 555-0123',
   email: 'info@purplelounge.com',
   description: 'A sophisticated nightclub in downtown Austin',
-  openingHours: {
-    monday: '18:00-02:00',
-    tuesday: '18:00-02:00',
-    wednesday: '18:00-02:00',
-    thursday: '18:00-02:00',
-    friday: '18:00-03:00',
-    saturday: '18:00-03:00',
-    sunday: '18:00-02:00'
-  },
+  timezone: 'America/Chicago',
+  taxRate: 8.25,
+  operatingHours: [
+    { dayOfWeek: 1, open: '18:00', close: '02:00', isOpen: true }, // Monday
+    { dayOfWeek: 2, open: '18:00', close: '02:00', isOpen: true }, // Tuesday
+    { dayOfWeek: 3, open: '18:00', close: '02:00', isOpen: true }, // Wednesday
+    { dayOfWeek: 4, open: '18:00', close: '02:00', isOpen: true }, // Thursday
+    { dayOfWeek: 5, open: '18:00', close: '03:00', isOpen: true }, // Friday
+    { dayOfWeek: 6, open: '18:00', close: '03:00', isOpen: true }, // Saturday
+    { dayOfWeek: 0, open: '18:00', close: '02:00', isOpen: true }  // Sunday
+  ],
   status: 'open',
   type: 'nightclub',
   capacity: 300,
-  sections: ['main-floor', 'vip-area', 'rooftop'],
+  sections: [{ id: 'main-floor', name: 'Main Floor' }, { id: 'vip-area', name: 'VIP Area' }, { id: 'rooftop', name: 'Rooftop' }],
   amenities: ['vip-service', 'dance-floor', 'smoking-area'],
-  rating: 4.5
+  rating: 4.5,
+  tables: []
 };
 
 interface VenueState {
@@ -76,7 +79,7 @@ const initialState: VenueState = {
 
 const venueNames = [
   "The Purple Lounge",
-  "Bottcierge Bar & Grill",
+  "Bottcierge",
   "Skyline Social",
   "The Rustic Barrel",
   "Urban Spirits",
@@ -94,14 +97,34 @@ const generateRandomVenue = (tableId: string): Venue => {
     name: randomName,
     address: "123 Main Street",
     description: "A cozy spot for food and drinks",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78701",
+    phoneNumber: "(512) 555-0123",
+    timezone: "America/Chicago",
+    taxRate: 8.25,
+    status: "open",
+    type: "bar",
+    capacity: 100,
+    operatingHours: [
+      {
+        dayOfWeek: 1,
+        open: "16:00",
+        close: "02:00",
+        isOpen: true
+      }
+    ],
+    sections: [],
+    amenities: ["Wi-Fi", "Parking"],
     tables: [{
       id: tableId,
-      number: tableId,
-      status: 'available',
+      number: "1",
+      status: "available",
       capacity: 4,
       x: 0,
       y: 0
-    }]
+    }],
+    rating: 4.5
   };
 };
 
@@ -140,13 +163,13 @@ export const fetchVenueDetails = createAsyncThunk(
 
 export const updateStaffStatus = createAsyncThunk(
   'venue/updateStaffStatus',
-  async ({ 
-    staffId, 
-    status, 
-    sectionId 
-  }: { 
-    staffId: string; 
-    status: Staff['status']; 
+  async ({
+    staffId,
+    status,
+    sectionId
+  }: {
+    staffId: string;
+    status: Staff['status'];
     sectionId?: string;
   }, { rejectWithValue }) => {
     try {
@@ -175,11 +198,11 @@ export const fetchVenueMetrics = createAsyncThunk(
 
 export const updatePricingRule = createAsyncThunk(
   'venue/updatePricingRule',
-  async ({ 
-    ruleId, 
-    updates 
-  }: { 
-    ruleId: string; 
+  async ({
+    ruleId,
+    updates
+  }: {
+    ruleId: string;
     updates: Partial<PricingRule>;
   }, { rejectWithValue }) => {
     try {
