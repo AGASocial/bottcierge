@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const currentTableCode = useSelector((state: RootState) => state.table.currentTableCode);
-  const { currentOrder } = useSelector((state: RootState) => state.order);
+  const { currentOrder, orderHistory } = useSelector((state: RootState) => state.order);
   const { products: allProducts } = useSelector((state: RootState) => state.menu);
 
   useEffect(() => {
@@ -94,6 +94,33 @@ const Home: React.FC = () => {
             <ClipboardDocumentListIcon className="w-8 h-8 text-neon-pink" />
             <h2 className="text-xl font-bold">View Orders</h2>
           </div>
+          {orderHistory?.filter(order => 
+            ['paid', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())
+          ).map(order => (
+            <div key={order.id} className="mb-3 p-3 rounded-lg bg-black/30 border border-white/10">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">#{order.orderNumber}</span>
+                <span className={`px-2 py-1 rounded text-sm ${
+                  order.status.toLowerCase() === 'paid' ? 'bg-blue-500/20 text-blue-300' :
+                  order.status.toLowerCase() === 'preparing' ? 'bg-yellow-500/20 text-yellow-300' :
+                  order.status.toLowerCase() === 'ready' ? 'bg-green-500/20 text-green-300' :
+                  'bg-purple-500/20 text-purple-300'
+                }`}>
+                  {order.status}
+                </span>
+              </div>
+              <div className="flex justify-between mt-2 text-sm text-gray-400">
+                <span>{new Date(order.createdAt).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                })}</span>
+                <span>${order.total.toFixed(2)}</span>
+              </div>
+            </div>
+          ))}
           <p className="text-gray-300">
             Check your current and past orders
           </p>
