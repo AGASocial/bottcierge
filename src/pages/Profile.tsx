@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
 
   const getPreferencesSummary = () => {
     if (!preferences) return [];
-    
+
     const summary = [];
     if (preferences.venues?.length > 0) {
       summary.push(`${preferences.venues.length} venues`);
@@ -53,6 +53,31 @@ const Profile: React.FC = () => {
 
       {/* Profile Sections */}
       <div className="space-y-6">
+
+        {/* Nightlife Preferences Summary */}
+        <Link to="/preferences" className="block">
+          <div className="glass-card p-6 hover:bg-white/5 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-2">
+                  <HeartIcon className="w-6 h-6" />
+                  <h2 className="text-xl font-bold">Nightlife Preferences</h2>
+                </div>
+                {preferences ? (
+                  <p className="text-sm text-gray-300">
+                    {getPreferencesSummary().join(' • ')}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-300">
+                    Tell us about your perfect night out
+                  </p>
+                )}
+              </div>
+              <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+            </div>
+          </div>
+        </Link>
+
         {/* Payment Methods */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
@@ -81,29 +106,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
 
-        {/* Nightlife Preferences Summary */}
-        <Link to="/preferences" className="block">
-          <div className="glass-card p-6 hover:bg-white/5 transition-colors">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <HeartIcon className="w-6 h-6" />
-                  <h2 className="text-xl font-bold">Nightlife Preferences</h2>
-                </div>
-                {preferences ? (
-                  <p className="text-sm text-gray-300">
-                    {getPreferencesSummary().join(' • ')}
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-300">
-                    Tell us about your perfect night out
-                  </p>
-                )}
-              </div>
-              <ChevronRightIcon className="w-5 h-5 text-gray-400" />
-            </div>
-          </div>
-        </Link>
+
 
         {/* Notifications */}
         <div className="glass-card p-6">

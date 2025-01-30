@@ -8,6 +8,7 @@ import { getProducts } from '../store/slices/menuSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import toast, { Toaster } from 'react-hot-toast';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -146,9 +147,9 @@ const Home: React.FC = () => {
                 {product.image && (
                   <div className="aspect-w-16 aspect-h-9">
                     <img
-                      src={product.image}
+                      src={getImageUrl(product.image)}
                       alt={product.name}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-96 object-cover"
                     />
                   </div>
                 )}

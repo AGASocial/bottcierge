@@ -7,6 +7,7 @@ import type { AppDispatch, RootState } from '../store';
 import { getProducts, getCategories, setSelectedProduct } from '../store/slices/menuSlice';
 import { addItemToOrder, removeFromCart } from '../store/slices/orderSlice';
 import type { Product, OrderItem } from '../types';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Menu: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -214,9 +215,9 @@ const Menu: React.FC = () => {
                         {product.image && (
                           <div className="aspect-w-16 aspect-h-9">
                             <img
-                              src={product.image}
+                              src={getImageUrl(product.image)}
                               alt={product.name}
-                              className="w-full h-48 object-cover"
+                              className="w-full h-128 object-cover"
                             />
                           </div>
                         )}

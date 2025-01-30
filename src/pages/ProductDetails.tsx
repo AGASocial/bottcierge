@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import type { RootState, AppDispatch } from '../store';
 import { addItemToOrder } from '../store/slices/orderSlice';
 import type { Product } from '../types';
+import { getImageUrl } from '../utils/imageUtils';
 
 interface CustomizationOption {
   id: string;
@@ -125,7 +126,7 @@ const ProductDetails: React.FC = () => {
         <div className={`${currentOrder ? 'bg-deep-blue' : 'bg-sky-500/25'} rounded-lg shadow-lg overflow-hidden`}>
           {product.image && (
             <img
-              src={product.image}
+              src={getImageUrl(product.image)}
               alt={product.name}
               className="w-full h-64 object-cover"
             />

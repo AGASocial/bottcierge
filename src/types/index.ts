@@ -216,3 +216,17 @@ export interface ReservationHistory {
   revenue: number;
   rating: number;
 }
+
+export interface NightlifePreferences {
+  id: string;
+  userId: string;
+  favoriteVenueTypes: string[];
+  preferredMusicGenres: string[];
+  preferredDrinks: string[];
+  spendingRange: {
+    min: number;
+    max: number;
+  };
+  preferredNights: string[];
+  updatedAt: string;
+}
