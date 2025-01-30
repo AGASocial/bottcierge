@@ -134,6 +134,31 @@ const orderSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    updateOrderStatusSocket: (state, action) => {
+      const { orderId, status } = action.payload;
+      console.log('Updating order status in Redux:', { orderId, status });
+
+      // Update in orderHistory
+      const orderIndex = state.orderHistory.findIndex(order => order.id === orderId);
+      if (orderIndex !== -1) {
+        console.log('Found order in history, updating status');
+        state.orderHistory[orderIndex] = {
+          ...state.orderHistory[orderIndex],
+          status: status as OrderStatus
+        };
+      } else {
+        console.log('Order not found in history:', orderId);
+      }
+
+      // Update currentOrder if it matches
+      if (state.currentOrder && state.currentOrder.id === orderId) {
+        console.log('Updating current order status');
+        state.currentOrder = {
+          ...state.currentOrder,
+          status: status as OrderStatus
+        };
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -208,6 +233,6 @@ const orderSlice = createSlice({
   },
 });
 
-export const { clearCart, removeFromCart, updateItemQuantity, clearError } = orderSlice.actions;
+export const { clearCart, removeFromCart, updateItemQuantity, clearError, updateOrderStatusSocket } = orderSlice.actions;
 
 export default orderSlice.reducer;

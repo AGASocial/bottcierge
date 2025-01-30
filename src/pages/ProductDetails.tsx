@@ -128,7 +128,7 @@ const ProductDetails: React.FC = () => {
             <img
               src={getImageUrl(product.image)}
               alt={product.name}
-              className="w-full h-64 object-cover"
+              className="w-full h-128 object-cover"
             />
           )}
 

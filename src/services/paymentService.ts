@@ -50,7 +50,7 @@ class PaymentService {
     billingAddress: BillingAddress
   ): Promise<string> {
     try {
-      const response = await api.post('/payment/validate', {
+      const response = await api.post('/payments/validate', {
         cardInfo,
         billingAddress,
       });
@@ -62,7 +62,7 @@ class PaymentService {
 
   public async processPayment(paymentRequest: PaymentRequest): Promise<PaymentResponse> {
     try {
-      const response = await api.post('/payment/process', paymentRequest);
+      const response = await api.post('/payments/process', paymentRequest);
       return response.data;
     } catch (error) {
       throw new Error('Payment processing failed');
@@ -71,7 +71,7 @@ class PaymentService {
 
   public async getPaymentStatus(orderId: string): Promise<PaymentResponse> {
     try {
-      const response = await api.get(`/payment/status/${orderId}`);
+      const response = await api.get(`/payments/status/${orderId}`);
       return response.data;
     } catch (error) {
       throw new Error('Failed to get payment status');

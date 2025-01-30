@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import { QrCodeIcon, ClipboardDocumentListIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import type { RootState } from '../store';
 import { getProducts } from '../store/slices/menuSlice';
+import { getOrders } from '@/store/slices/orderSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import toast, { Toaster } from 'react-hot-toast';
 import { getImageUrl } from '../utils/imageUtils';
+import { websocketService } from '../services/websocketService';
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,7 +21,30 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     dispatch(getProducts());
+    dispatch(getOrders());
   }, [dispatch]);
+
+  // Handle WebSocket initialization
+  useEffect(() => {
+    // Initialize WebSocket connection
+    websocketService.initialize(dispatch);
+
+    return () => {
+      websocketService.cleanup();
+    };
+  }, [dispatch]);
+
+  // Handle order subscriptions
+  useEffect(() => {
+    if (!orderHistory) return;
+
+    // Subscribe to updates for all active orders
+    orderHistory.forEach(order => {
+      if (['paid', 'accepted','preparing', 'ready', 'serving'].includes(order.status.toLowerCase())) {
+        websocketService.subscribeToOrder(order.id);
+      }
+    });
+  }, [orderHistory]);
 
   // Get 3 random products for featured section
   const featuredProducts = useMemo(() => {
@@ -95,7 +120,7 @@ const Home: React.FC = () => {
             <h2 className="text-xl font-bold">View Orders</h2>
           </div>
           {orderHistory?.filter(order => 
-            ['paid', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())
+            ['paid', 'accepted', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())
           ).map(order => (
             <div key={order.id} className="mb-3 p-3 rounded-lg bg-black/30 border border-white/10">
               <div className="flex justify-between items-center">
