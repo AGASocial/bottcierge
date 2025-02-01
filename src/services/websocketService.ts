@@ -40,15 +40,21 @@ class WebSocketService {
 
     // Listen for order status updates
     this.socket.on('orderStatusUpdate', (update: OrderStatusUpdate) => {
-      console.log('Received order status update4:', update);
+      console.log('WebSocket: Received order status update:', update);
+      
+      // Only process if we have dispatch available
       if (this.dispatch) {
-        console.log('Dispatching order status update to Redux');
+        console.log('WebSocket: Dispatching order status update to Redux');
         this.dispatch(updateOrderStatusSocket(update));
+        
+        // Notify all registered callbacks
+        this.statusUpdateCallbacks.forEach(callback => {
+          console.log('WebSocket: Notifying callback for order:', update.orderId);
+          callback(update);
+        });
       } else {
-        console.error('Dispatch not available for order status update');
+        console.error('WebSocket: Dispatch not available for order status update');
       }
-      // Notify all callbacks
-      this.statusUpdateCallbacks.forEach(callback => callback(update));
     });
 
     // Listen for all orders updates
@@ -95,9 +101,29 @@ class WebSocketService {
 
   subscribeToOrder(orderId: string) {
     if (this.socket) {
-      console.log('Subscribing to order:', orderId);
-      this.socket.emit('subscribeToOrder', { orderId });
-      this.subscribedOrders.add(orderId);
+      if (!this.subscribedOrders.has(orderId)) {
+        console.log('WebSocket: Subscribing to order:', orderId);
+        this.socket.emit('subscribeToOrder', { orderId });
+        this.subscribedOrders.add(orderId);
+        
+        // Set up specific listener for this order
+        this.socket.on(`orderUpdate:${orderId}`, (update: OrderStatusUpdate) => {
+          console.log(`WebSocket: Received update for order ${orderId}:`, update);
+          if (this.dispatch) {
+            this.dispatch(updateOrderStatusSocket(update));
+            
+            // Notify callbacks
+            this.statusUpdateCallbacks.forEach(callback => {
+              console.log(`WebSocket: Notifying callback for order ${orderId}`);
+              callback(update);
+            });
+          }
+        });
+      } else {
+        console.log(`WebSocket: Already subscribed to order: ${orderId}`);
+      }
+    } else {
+      console.error('WebSocket: Cannot subscribe to order - socket not initialized');
     }
   }
 

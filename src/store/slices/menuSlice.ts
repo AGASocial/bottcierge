@@ -22,7 +22,7 @@ export const getCategories = createAsyncThunk(
   'menu/getCategories',
   async () => {
     const response = await api.get('/menu/categories');
-    return response.data.data.filter((b: any) => b.isActive);
+    return response.data.filter((b: any) => b.isActive);
   }
 );
 
@@ -30,7 +30,7 @@ export const getProducts = createAsyncThunk(
   'menu/getProducts',
   async () => {
     const response = await api.get('/menu/products');
-    return response.data.data;
+    return response.data;
   }
 );
 

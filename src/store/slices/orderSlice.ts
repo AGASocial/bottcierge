@@ -136,15 +136,26 @@ const orderSlice = createSlice({
     },
     updateOrderStatusSocket: (state, action) => {
       const { orderId, status } = action.payload;
+      console.log('Updating order status in Redux:', { orderId, status });
       
       // Update in order history
-      state.orderHistory = state.orderHistory.map(order =>
-        order.id === orderId ? { ...order, status } : order
-      );
+      const orderExists = state.orderHistory.some(order => order.id === orderId);
+      
+      if (orderExists) {
+        state.orderHistory = state.orderHistory.map(order =>
+          order.id === orderId ? { ...order, status, updatedAt: new Date().toISOString() } : order
+        );
+        console.log('Updated order in history');
+      } else {
+        console.log('Order not found in history, fetching fresh data');
+        // If we don't have the order in history, we should fetch fresh data
+        state.loading = true;
+      }
       
       // Update current order if it matches
       if (state.currentOrder && state.currentOrder.id === orderId) {
-        state.currentOrder = { ...state.currentOrder, status };
+        state.currentOrder = { ...state.currentOrder, status, updatedAt: new Date().toISOString() };
+        console.log('Updated current order');
       }
     }
   },

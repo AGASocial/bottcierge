@@ -1,87 +1,45 @@
-import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { motion } from 'framer-motion';
-import { QrCodeIcon, ClipboardDocumentListIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import type { RootState } from '../store';
-import { getProducts } from '../store/slices/menuSlice';
-import { getOrders, updateOrderStatusSocket } from '@/store/slices/orderSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../store';
-import toast, { Toaster } from 'react-hot-toast';
-import { getImageUrl } from '../utils/imageUtils';
-import { websocketService } from '../services/websocketService';
+import React, { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
+import {
+  QrCodeIcon,
+  ClipboardDocumentListIcon,
+  ArrowRightIcon,
+} from "@heroicons/react/24/outline";
+import type { RootState } from "../store";
+import { getProducts } from "../store/slices/menuSlice";
+import { getOrders } from "@/store/slices/orderSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
+import { getImageUrl } from "../utils/imageUtils";
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const currentTableCode = useSelector((state: RootState) => state.table.currentTableCode);
-  const { currentOrder, orderHistory } = useSelector((state: RootState) => state.order);
-  const { products: allProducts } = useSelector((state: RootState) => state.menu);
+  const currentTableCode = useSelector(
+    (state: RootState) => state.table.currentTableCode
+  );
+  const { currentOrder, orderHistory } = useSelector(
+    (state: RootState) => state.order
+  );
+  const { products: allProducts } = useSelector(
+    (state: RootState) => state.menu
+  );
 
   useEffect(() => {
     dispatch(getProducts());
     dispatch(getOrders());
   }, [dispatch]);
 
-  // Handle WebSocket initialization
-  useEffect(() => {
-    // Initialize WebSocket connection
-    websocketService.initialize(dispatch);
-
-    // Subscribe to all orders for real-time updates
-    websocketService.subscribeToAllOrders();
-
-    // Listen for individual order status updates
-    websocketService.onOrderStatusUpdate((update) => {
-      // Update the order in Redux store
-      dispatch(updateOrderStatusSocket(update));
-      
-      // Show toast notification for status change
-      // const statusMessages: { [key: string]: string } = {
-      //   accepted: 'Your order has been accepted! 🎉',
-      //   preparing: 'Your order is being prepared! 👨‍🍳',
-      //   serving: 'Your order is on its way! 🏃‍♂️',
-      //   completed: 'Your order has been delivered! ✅',
-      //   cancelled: 'Your order has been cancelled. 😢'
-      // };
-
-      // const message = statusMessages[update.status.toLowerCase()];
-      // if (message) {
-      //   toast.success(message, {
-      //     duration: 4000,
-      //     style: {
-      //       background: '#dedede',
-      //       color: '#000',
-      //       borderRadius: '10px',
-      //     },
-      //   });
-      // }
-    });
-
-    return () => {
-      websocketService.cleanup();
-    };
-  }, [dispatch]);
-
   // Handle order subscriptions
   useEffect(() => {
-    if (!orderHistory) return;
-
-    // Subscribe to updates for all active orders
-    orderHistory.forEach(order => {
-      if (['paid', 'accepted', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())) {
-        websocketService.subscribeToOrder(order.id);
-      }
-    });
-
-    // Cleanup function to unsubscribe from orders
-    return () => {
-      orderHistory.forEach(order => {
-        websocketService.unsubscribeFromOrder(order.id);
-      });
-    };
-  }, [orderHistory]);
+    if (!orderHistory) {
+      // Only fetch orders if orderHistory is null/undefined
+      dispatch(getOrders());
+    }
+  }, [dispatch, orderHistory]);
 
   // Get 3 random products for featured section
   const featuredProducts = useMemo(() => {
@@ -94,30 +52,30 @@ const Home: React.FC = () => {
     if (currentTableCode) {
       navigate(`/table/${currentTableCode}`);
     } else {
-      navigate('/table/scan');
+      navigate("/table/scan");
     }
   };
 
   const handleCallStacy = () => {
-    toast.success('Stacy has been notified and will be with you shortly!', {
-      icon: '👋',
+    toast.success("Stacy has been notified and will be with you shortly!", {
+      icon: "👋",
       duration: 3000,
       style: {
-        background: '#dedede',
-        color: '#000',
-        borderRadius: '10px',
+        background: "#dedede",
+        color: "#000",
+        borderRadius: "10px",
       },
     });
   };
 
   const handleRefill = (text: string) => {
     toast.success(`${text}`, {
-      icon: '🍹',
+      icon: "🍹",
       duration: 3000,
       style: {
-        background: '#dedede',
-        color: '#000',
-        borderRadius: '10px',
+        background: "#dedede",
+        color: "#000",
+        borderRadius: "10px",
       },
     });
   };
@@ -142,49 +100,61 @@ const Home: React.FC = () => {
           <p className="text-gray-300">
             {currentTableCode
               ? "Continue ordering for your current table"
-              : "To start a new order, please enter or scan your table's QR code"
-            }
+              : "To start a new order, please enter or scan your table's QR code"}
           </p>
         </div>
 
         {/* View Orders */}
         <div
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate("/orders")}
           className="glass-card p-6 cursor-pointer hover:bg-white/20 transition-all duration-300"
         >
           <div className="flex items-center space-x-4 mb-4">
             <ClipboardDocumentListIcon className="w-8 h-8 text-neon-pink" />
             <h2 className="text-xl font-bold">View Orders</h2>
           </div>
-          {orderHistory?.filter(order =>
-            ['paid', 'accepted', 'preparing', 'ready', 'serving'].includes(order.status.toLowerCase())
-          ).map(order => (
-            <div key={order.id} className="mb-3 p-3 rounded-lg bg-black/30 border border-white/10">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">#{order.orderNumber}</span>
-                <span className={`px-2 py-1 rounded text-sm ${order.status.toLowerCase() === 'paid' ? 'bg-blue-500/20 text-blue-300' :
-                  order.status.toLowerCase() === 'preparing' ? 'bg-yellow-500/20 text-yellow-300' :
-                    order.status.toLowerCase() === 'ready' ? 'bg-green-500/20 text-green-300' :
-                      'bg-purple-500/20 text-purple-300'
-                  }`}>
-                  {order.status}
-                </span>
+          {(Array.isArray(orderHistory) ? orderHistory : [])
+            ?.filter((order) =>
+              ["paid", "accepted", "preparing", "ready", "serving"].includes(
+                order.status.toLowerCase()
+              )
+            )
+            .map((order) => (
+              <div
+                key={order.id}
+                className="mb-3 p-3 rounded-lg bg-black/30 border border-white/10"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">#{order.orderNumber}</span>
+                  <span
+                    className={`px-2 py-1 rounded text-sm ${
+                      order.status.toLowerCase() === "paid"
+                        ? "bg-blue-500/20 text-blue-300"
+                        : order.status.toLowerCase() === "preparing"
+                        ? "bg-yellow-500/20 text-yellow-300"
+                        : order.status.toLowerCase() === "ready"
+                        ? "bg-green-500/20 text-green-300"
+                        : "bg-purple-500/20 text-purple-300"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+                </div>
+                <div className="flex justify-between mt-2 text-sm text-gray-400">
+                  <span>
+                    {new Date(order.createdAt).toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </span>
+                  <span>${order.total.toFixed(2)}</span>
+                </div>
               </div>
-              <div className="flex justify-between mt-2 text-sm text-gray-400">
-                <span>{new Date(order.createdAt).toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  hour12: true
-                })}</span>
-                <span>${order.total.toFixed(2)}</span>
-              </div>
-            </div>
-          ))}
-          <p className="text-gray-300">
-            Check your current and past orders
-          </p>
+            ))}
+          <p className="text-gray-300">Check your current and past orders</p>
         </div>
       </div>
 
@@ -192,26 +162,23 @@ const Home: React.FC = () => {
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
-            onClick={handleCallStacy}
-            className="btn-primary"
-          >
+          <button onClick={handleCallStacy} className="btn-primary">
             Call Stacy
           </button>
           <button
-            onClick={() => handleRefill('Ice is on the way!')}
+            onClick={() => handleRefill("Ice is on the way!")}
             className="btn-secondary"
           >
             Refill Ice
           </button>
           <button
-            onClick={() => handleRefill('Mixers are on the way!')}
+            onClick={() => handleRefill("Mixers are on the way!")}
             className="btn-secondary"
           >
             Refill Mixers
           </button>
           <button
-            onClick={() => handleRefill('Ice & mixers are on the way!')}
+            onClick={() => handleRefill("Ice & mixers are on the way!")}
             className="btn-secondary"
           >
             Refill Ice & Mixers
@@ -251,10 +218,15 @@ const Home: React.FC = () => {
                         {product.description}
                       </p>
                       <div className="mt-2 space-y-1">
-                        {product.sizes.map(size => (
-                          <div key={size.id} className="flex justify-between text-sm">
+                        {product.sizes.map((size) => (
+                          <div
+                            key={size.id}
+                            className="flex justify-between text-sm"
+                          >
                             <span className="text-light-blue">{size.name}</span>
-                            <span className="text-white">${size.currentPrice?.toFixed(2)}</span>
+                            <span className="text-white">
+                              ${size.currentPrice?.toFixed(2)}
+                            </span>
                           </div>
                         ))}
                       </div>

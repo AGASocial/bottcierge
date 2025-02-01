@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../services/api";
 
 export interface PreferenceOption {
   value: string;
@@ -36,31 +36,31 @@ const initialState: ProfileState = {
 };
 
 export const fetchProfile = createAsyncThunk(
-  'profile/fetchProfile',
+  "profile/fetchProfile",
   async () => {
-    const response = await api.get('/profile');
-    return response.data.data;
+    const response = await api.get("/profile");
+    return response.data;
   }
 );
 
 export const fetchPreferenceOptions = createAsyncThunk(
-  'profile/fetchPreferenceOptions',
+  "profile/fetchPreferenceOptions",
   async () => {
-    const response = await api.get('/profile/preferences/options');
-    return response.data.data;
+    const response = await api.get("/profile/preferences/options");
+    return response.data;
   }
 );
 
 export const updatePreferences = createAsyncThunk(
-  'profile/updatePreferences',
+  "profile/updatePreferences",
   async (preferences: any) => {
-    const response = await api.patch('/profile/preferences', preferences);
-    return response.data.data;
+    const response = await api.patch("/profile/preferences", preferences);
+    return response.data;
   }
 );
 
 const profileSlice = createSlice({
-  name: 'profile',
+  name: "profile",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -81,7 +81,7 @@ const profileSlice = createSlice({
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch profile';
+        state.error = action.error.message || "Failed to fetch profile";
       })
       // Fetch Preference Options
       .addCase(fetchPreferenceOptions.pending, (state) => {
@@ -94,7 +94,8 @@ const profileSlice = createSlice({
       })
       .addCase(fetchPreferenceOptions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch preference options';
+        state.error =
+          action.error.message || "Failed to fetch preference options";
       })
       // Update Preferences
       .addCase(updatePreferences.pending, (state) => {
@@ -108,7 +109,7 @@ const profileSlice = createSlice({
       })
       .addCase(updatePreferences.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to update preferences';
+        state.error = action.error.message || "Failed to update preferences";
       });
   },
 });

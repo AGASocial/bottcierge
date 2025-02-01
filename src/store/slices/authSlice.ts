@@ -19,7 +19,7 @@ export const login = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     const response = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', response.data.token);
-    return response.data.data;
+    return response.data.user;
   }
 );
 
@@ -28,7 +28,7 @@ export const getCurrentUser = createAsyncThunk(
   async () => {
     try {
       const response = await api.get('/auth/me');
-      return response.data.data;
+      return response.data.user;
     } catch (error) {
       localStorage.removeItem('token');
       throw error;
@@ -41,7 +41,7 @@ export const register = createAsyncThunk(
   async (userData: Partial<User>) => {
     const response = await api.post('/auth/register', userData);
     localStorage.setItem('token', response.data.token);
-    return response.data.data;
+    return response.data.user;
   }
 );
 
