@@ -50,7 +50,7 @@ const Cart: React.FC = () => {
 
   const getOrderStatusColor = (status: string) => {
     switch (status) {
-      case 'created':
+      case 'paid':
         return 'bg-blue-100 text-blue-800';
       case 'authorized':
         return 'bg-purple-100 text-purple-800';

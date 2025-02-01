@@ -37,7 +37,7 @@ export const getProducts = createAsyncThunk(
 export const getProductById = createAsyncThunk(
   'menu/getProductById',
   async (productId: string) => {
-    const response = await api.get(`/menu/products/${productId}`);
+    const response = await api.get(`/menu/product/${productId}`);
     return response.data;
   }
 );
@@ -45,7 +45,7 @@ export const getProductById = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
   'menu/updateProduct',
   async ({ id, data }: { id: string; data: Partial<Product> }) => {
-    const response = await api.put(`/menu/products/${id}`, data);
+    const response = await api.put(`/menu/product/${id}`, data);
     return response.data;
   }
 );
@@ -53,7 +53,7 @@ export const updateProduct = createAsyncThunk(
 export const updateProductInventory = createAsyncThunk(
   'menu/updateInventory',
   async ({ id, inventory }: { id: string; inventory: { current: number } }) => {
-    const response = await api.patch(`/menu/products/${id}/inventory`, inventory);
+    const response = await api.patch(`/menu/product/${id}/inventory`, inventory);
     return response.data;
   }
 );
