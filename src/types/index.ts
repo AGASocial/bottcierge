@@ -166,13 +166,15 @@ export interface OperatingHours {
 }
 
 export interface PricingRule {
-  id: string;
-  name: string;
-  startTime: string;
-  endTime: string;
-  daysApplicable: number[];
-  multiplier: number;
-  affectedCategories: string[];
+  [key: string]: number;
+  // id: string;
+  // name: string;
+  // minimumSpend: number;
+  // startTime: string;
+  // endTime: string;
+  // daysApplicable: number[];
+  // multiplier: number;
+  // affectedCategories: string[];
 }
 
 export interface VenueEvent {

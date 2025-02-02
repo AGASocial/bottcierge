@@ -4,7 +4,7 @@ import axios from 'axios';
 import type { Venue, Staff, Section, VenueEvent, PricingRule } from '../../types';
 
 const defaultVenue: Venue = {
-  id: 'default-venue',
+  id: 'd6a2ed83-30d5-419c-ad3f-0e837d7fcb94',
   name: 'The Purple Lounge',
   address: '123 Main St',
   city: 'Austin',

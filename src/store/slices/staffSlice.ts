@@ -24,6 +24,14 @@ export const getStaffMembers = createAsyncThunk(
   }
 );
 
+export const getStaffMembersFromVenue = createAsyncThunk(
+  'staff/getStaffMembersFromVenue',
+  async (venueId: string) => {
+    const response = await api.get(`/venues/${venueId}/staff`);
+    return response.data;
+  }
+);
+
 export const getStaffById = createAsyncThunk(
   'staff/getStaffById',
   async (staffId: string) => {
@@ -87,6 +95,19 @@ const staffSlice = createSlice({
         state.staffMembers = action.payload;
       })
       .addCase(getStaffMembers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get staff members';
+      })
+      // Get staff members from venue
+      .addCase(getStaffMembersFromVenue.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getStaffMembersFromVenue.fulfilled, (state, action) => {
+        state.loading = false;
+        state.staffMembers = action.payload;
+      })
+      .addCase(getStaffMembersFromVenue.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to get staff members';
       })
