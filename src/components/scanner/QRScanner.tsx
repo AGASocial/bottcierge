@@ -56,11 +56,48 @@ const QRScanner: React.FC<QRScannerProps> = ({
       
       // Get list of video devices
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      setVideoInputDevices(videoDevices);
+      const allVideoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      // Filter to get one front and one back camera
+      const filteredDevices = allVideoDevices.reduce((acc: MediaDeviceInfo[], device) => {
+        const label = device.label?.toLowerCase() || '';
+        const isBack = label.includes('back') || label.includes('rear');
+        const isFront = label.includes('front');
+        
+        // For back camera, prefer the one without 'wide' or 'ultra' in the name
+        if (isBack) {
+          const existingBack = acc.find(d => d.label?.toLowerCase().includes('back') || d.label?.toLowerCase().includes('rear'));
+          if (!existingBack || (label.includes('back') && !label.includes('wide') && !label.includes('ultra'))) {
+            if (existingBack) {
+              acc = acc.filter(d => d !== existingBack);
+            }
+            acc.push(device);
+          }
+        } else if (isFront && !acc.some(d => d.label?.toLowerCase().includes('front'))) {
+          acc.push(device);
+        } else if (allVideoDevices.length === 2) {
+          // If we have exactly 2 cameras and they're not labeled
+          if (device === allVideoDevices[0] && !acc.some(d => d.label?.toLowerCase().includes('front'))) {
+            acc.push(device); // Assume first is front
+          } else if (device === allVideoDevices[1] && !acc.some(d => d.label?.toLowerCase().includes('back'))) {
+            acc.push(device); // Assume second is back
+          }
+        }
+        return acc;
+      }, []);
 
-      // Use the first available device if none selected
-      const deviceId = selectedDeviceId || videoDevices[0]?.deviceId;
+      setVideoInputDevices(filteredDevices);
+
+      // Use the first available device if none selected, prefer back camera
+      let deviceId = selectedDeviceId;
+      if (!deviceId) {
+        // Try to find a back camera first
+        const backCamera = filteredDevices.find(d => {
+          const label = d.label?.toLowerCase() || '';
+          return label.includes('back') || label.includes('rear');
+        });
+        deviceId = backCamera?.deviceId || filteredDevices[0]?.deviceId;
+      }
       
       if (!deviceId) {
         const noDeviceError = new Error('No camera found. Please make sure your device has a camera.');
@@ -205,13 +242,13 @@ const QRScanner: React.FC<QRScannerProps> = ({
                     let label = device.label?.toLowerCase() || '';
                     let friendlyName = 'Camera';
                     
-                    if (label.includes('back') || label.includes('rear')) {
+                    // Simpler logic since we've already filtered the devices
+                    if (label.includes('back') || label.includes('rear') || 
+                        (videoInputDevices.length === 2 && device === videoInputDevices[1])) {
                       friendlyName = 'Back Camera';
-                    } else if (label.includes('front')) {
+                    } else if (label.includes('front') || 
+                             (videoInputDevices.length === 2 && device === videoInputDevices[0])) {
                       friendlyName = 'Front Camera';
-                    } else if (videoInputDevices.length === 2) {
-                      // If we have exactly 2 cameras and they're not labeled, assume the first is front and second is back
-                      friendlyName = device === videoInputDevices[0] ? 'Front Camera' : 'Back Camera';
                     }
                     
                     return (
