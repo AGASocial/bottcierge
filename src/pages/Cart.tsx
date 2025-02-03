@@ -105,7 +105,7 @@ const Cart: React.FC = () => {
                 {currentOrder.items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/20"
+                    className="bg-white/5 rounded-lg p-4 border border-white/20"
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
