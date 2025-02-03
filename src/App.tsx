@@ -46,13 +46,13 @@ function App() {
 
       // Show toast notification for status change
       const statusMessages: { [key: string]: string } = {
-        paid: "Order received and paid! 🎉",
-        accepted: "Your order has been accepted! 🎉",
-        preparing: "Your order is being prepared! 👨‍🍳",
-        ready: "Your order is ready! 🍸",
-        serving: "Your order is on its way! 🏃‍♂️",
-        completed: "Your order has been delivered! ✅",
-        cancelled: "Your order has been cancelled. 😢",
+        paid: `Order received and paid! 🎉`,
+        accepted: `Your order #${update.orderNumber} has been accepted! 🎉`,
+        preparing: `Your order #${update.orderNumber} is being prepared! 👨‍🍳`,
+        ready: `Your order #${update.orderNumber} is ready! 🍸`,
+        serving: `Your order #${update.orderNumber} is on its way! 🏃‍♂️`,
+        completed: `Your order #${update.orderNumber} has been delivered! ✅`,
+        cancelled: `Your order #${update.orderNumber} has been cancelled. 😢`,
       };
 
       const message = statusMessages[update.status.toLowerCase()];
@@ -93,7 +93,7 @@ function App() {
         websocketService.subscribeToOrder(order.id);
       }
     });
-
+    //////////////////////////////////
     // Cleanup function to unsubscribe from orders
     return () => {
       orderHistory.forEach((order) => {

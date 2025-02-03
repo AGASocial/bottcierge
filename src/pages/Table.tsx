@@ -14,6 +14,7 @@ import Cart from "../components/cart/Cart";
 import QuickActions from "../components/table/QuickActions";
 import type { AppDispatch, RootState } from "../store";
 import { useNavigate } from "react-router-dom";
+import { TableStatus } from "@/types";
 
 const Table: React.FC = () => {
   const { tableId } = useParams<{ tableId: string }>();
@@ -21,7 +22,7 @@ const Table: React.FC = () => {
   const navigate = useNavigate();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
-  const { selectedTable: currentTable, qrScanning } = useSelector(
+  const { currentTable, qrScanning } = useSelector(
     (state: RootState) => state.table
   );
   const { currentVenue } = useSelector((state: RootState) => state.venue);
@@ -32,6 +33,7 @@ const Table: React.FC = () => {
   } = useSelector((state: RootState) => state.order);
 
   useEffect(() => {
+    console.log("Table ID:", currentTable);
     if (tableId) {
       dispatch(getTableById(tableId));
     }
@@ -70,26 +72,23 @@ const Table: React.FC = () => {
   const renderTableStatus = (table: typeof currentTable) => {
     if (!table) return null;
 
-    const colors = {
-      available: "bg-green-400",
-      occupied: "bg-red-400",
-      reserved: "bg-yellow-400",
+    const colors: Record<TableStatus, string> = {
+      [TableStatus.AVAILABLE]: "bg-green-400",
+      [TableStatus.OCCUPIED]: "bg-red-400",
+      [TableStatus.RESERVED]: "bg-yellow-400",
+      [TableStatus.MAINTENANCE]: "bg-gray-400",
     };
 
     return (
       <span
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          colors[table.status]
+          colors[table.status as TableStatus]
         }`}
       >
         {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
       </span>
     );
   };
-
-  if (!currentTable) {
-    return <div>Loading...</div>;
-  }
 
   const canStartOrder = !isCreatingOrder && !currentOrder;
 
@@ -138,7 +137,10 @@ const Table: React.FC = () => {
               </h2>
             </div>
             <div className="space-y-2 text-white/90">
-              <p>Capacity: {currentTable?.capacity} people</p>
+              <p>
+                Capacity: ${currentTable?.capacity.minimum}-$
+                {currentTable?.capacity.maximum} people
+              </p>
               {currentTable?.status && (
                 <p>
                   Status:{" "}
@@ -150,7 +152,7 @@ const Table: React.FC = () => {
           </div>
 
           {/* Add QuickActions component */}
-          <QuickActions tableId={currentTable.id} />
+          {currentTable && <QuickActions tableId={currentTable.id} />}
         </div>
 
         <div className="mt-6">

@@ -18,8 +18,8 @@ import { getImageUrl } from "../utils/imageUtils";
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const selectedTable = useSelector(
-    (state: RootState) => state.table.selectedTable
+  const currentTable = useSelector(
+    (state: RootState) => state.table.currentTable
   );
   const { currentOrder, orderHistory } = useSelector(
     (state: RootState) => state.order
@@ -49,8 +49,8 @@ const Home: React.FC = () => {
   }, [allProducts]);
 
   const handleStartOrder = () => {
-    if (selectedTable?.number) {
-      navigate(`/table/${selectedTable.number}`);
+    if (currentTable?.number) {
+      navigate(`/table/${currentTable.number}`);
     } else {
       navigate("/table/scan");
     }
@@ -97,7 +97,7 @@ const Home: React.FC = () => {
             </h2>
           </div>
           <p className="text-gray-300">
-            {selectedTable?.number
+            {currentTable?.number
               ? "Continue ordering for your current table"
               : "To start a new order, please enter or scan your table's QR code"}
           </p>
@@ -158,7 +158,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      {selectedTable && (<div className="mt-12">
+      {currentTable && (<div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button onClick={handleCallStacy} className="btn-primary">

@@ -114,13 +114,70 @@ export interface Section {
   name: string;
 }
 
+export enum TableStatus {
+  AVAILABLE = "available",
+  RESERVED = "reserved",
+  OCCUPIED = "occupied",
+  MAINTENANCE = "maintenance",
+}
+
+export enum TableType {
+  ROUND = "round",
+  SQUARE = "square",
+  RECTANGLE = "rectangle",
+  DANCE_FLOOR = "dance_floor",
+  LOUNGE = "lounge",
+  BAR_ADJACENT = "bar_adjacent",
+  BALCONY = "balcony",
+  ROOFTOP = "rooftop",
+  CORNER = "corner",
+  HIGH_TOP = "high_top",
+  SHARED = "shared",
+  BOOTH = "booth"
+  
+}
+
 export interface Table {
   id: string;
+  venueId: string;
   number: string;
-  status: 'available' | 'occupied' | 'reserved';
-  x: number;
-  y: number;
-  capacity: number;
+  qrCode: string;
+  category: "regular" | "vip";
+  section: string;
+  capacity: {
+    minimum: number;
+    maximum: number;
+  };
+  location: {
+    floor: number;
+    position: string;
+    coordinates: {
+      x: number;
+      y: number;
+    };
+  };
+  minimumSpend: number;
+  status: TableStatus;
+  tableType: TableType;
+  reservation: TableReservation | null;
+  currentOrder: string | null;
+  reservationHistory: ReservationHistory[];
+}
+
+export interface TableReservation {
+  id: string;
+  userId: string;
+  startTime: Date;
+  endTime: Date;
+  minimumSpend: number;
+  specialRequests: string;
+}
+
+export interface ReservationHistory {
+  id: string;
+  date: Date;
+  revenue: number;
+  rating: number;
 }
 
 export interface Venue {

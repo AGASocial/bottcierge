@@ -1,9 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import type { Table } from '../../types';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import api from "../../services/api";
+import type { Table } from "../../types";
 
 interface TableState {
   tables: Table[];
-  selectedTable: Table | null;
+  currentTable: Table | null;
   currentTableCode: string | null;
   loading: boolean;
   error: string | null;
@@ -12,83 +13,87 @@ interface TableState {
 
 const initialState: TableState = {
   tables: [],
-  selectedTable: null,
+  currentTable: null,
   currentTableCode: null, // deprecated
   loading: false,
   error: null,
   qrScanning: false,
 };
 
-export const getTables = createAsyncThunk(
-  'table/getTables',
-  async () => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return [
-      {
-        id: '1',
-        number: '1',
-        status: 'available',
-        x: 20,
-        y: 20,
-        capacity: 4,
-      },
-      {
-        id: '2',
-        number: '2',
-        status: 'occupied',
-        x: 60,
-        y: 20,
-        capacity: 6,
-      },
-      // Add more mock tables as needed
-    ] as Table[];
+export const getTablesByVenueId = createAsyncThunk(
+  "table/getTables",
+  async (venueId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get<Table[]>(`/tables/venue/${venueId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to update table status"
+      );
+    }
+  }
+);
+
+export const updateTableStatus = createAsyncThunk(
+  "table/updateTableStatus",
+  async (tableId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/tables/${tableId}/status`);
+      console.log(response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to update table status"
+      );
+    }
   }
 );
 
 export const getTableById = createAsyncThunk(
-  'table/getTableById',
-  async (tableId: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return {
-      id: tableId,
-      number: tableId,
-      status: 'available',
-      x: 20,
-      y: 20,
-      capacity: 4,
-    } as Table;
+  "table/getTableById",
+  async (tableId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get<Table>(`/tables/${tableId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to update table status"
+      );
+    }
   }
 );
 
 const tableSlice = createSlice({
-  name: 'table',
+  name: "table",
   initialState,
   reducers: {
     selectTable: (state, action: PayloadAction<Table | null>) => {
-      state.selectedTable = action.payload;
+      state.currentTable = action.payload;
     },
     setQRScanning: (state, action: PayloadAction<boolean>) => {
       state.qrScanning = action.payload;
     },
+    // deprecated
     setTableCode: (state, action: PayloadAction<string>) => {
       state.currentTableCode = action.payload;
+    },
+    setTableError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getTables.pending, (state) => {
+      .addCase(getTablesByVenueId.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getTables.fulfilled, (state, action) => {
+      .addCase(getTablesByVenueId.fulfilled, (state, action) => {
         state.loading = false;
         state.tables = action.payload;
       })
-      .addCase(getTables.rejected, (state, action) => {
+      .addCase(getTablesByVenueId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch tables';
+        state.error = action.error.message || "Failed to fetch tables";
       })
       .addCase(getTableById.pending, (state) => {
         state.loading = true;
@@ -96,15 +101,29 @@ const tableSlice = createSlice({
       })
       .addCase(getTableById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedTable = action.payload;
-        state.currentTableCode = action.payload.number;
+        state.currentTable = action.payload;
       })
       .addCase(getTableById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch table';
+        state.error = action.error.message || "Failed to fetch table";
+      })
+      .addCase(updateTableStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateTableStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.currentTable = action.payload;
+      })
+      .addCase(updateTableStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Failed to update table status";
       });
   },
 });
 
-export const { selectTable, setQRScanning, setTableCode } = tableSlice.actions;
+export const { selectTable, setQRScanning, setTableCode, setTableError } =
+  tableSlice.actions;
 export default tableSlice.reducer;

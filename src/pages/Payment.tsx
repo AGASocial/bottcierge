@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { processPayment } from "../store/slices/orderSlice";
 import type { AppDispatch, RootState } from "../store";
+import { websocketService } from "../services/websocketService";
 import {
   ArrowLeftIcon,
   CreditCardIcon,
@@ -62,6 +63,11 @@ const Payment: React.FC = () => {
           amount: calculateTotal(),
         })
       ).unwrap();
+
+      if (result.success && currentOrder) {
+        // Subscribe to order status updates
+        websocketService.subscribeToOrder(currentOrder.id);
+      }
 
       navigate("/receipt", {
         state: {

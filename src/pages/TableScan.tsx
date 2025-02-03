@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { getTableById, setTableCode } from "../store/slices/tableSlice";
+import {
+  getTableById,
+  setTableCode,
+  updateTableStatus,
+  setTableError,
+} from "../store/slices/tableSlice";
 import { setRandomVenue } from "../store/slices/venueSlice";
 import QRScanner from "../components/scanner/QRScanner";
 import type { AppDispatch, RootState } from "../store";
@@ -11,39 +16,36 @@ const TableScan: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { currentVenue } = useSelector((state: RootState) => state.venue);
+  const { error: tableError } = useSelector((state: RootState) => state.table);
   const [tableCode, setTableCodeState] = useState("");
   const [partySize, setPartySize] = useState(2);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleTableCodeSubmit = async () => {
-    try {
-      if (!tableCode.trim()) {
-        setError("Please enter a table code");
-        return;
-      }
+    if (!tableCode.trim()) {
+      dispatch(setTableError("Please enter a table code"));
+      return;
+    }
 
+    
+    const resultAction = await dispatch(updateTableStatus(tableCode));
+    console.log(resultAction);
+    if (updateTableStatus.fulfilled.match(resultAction)) {
       dispatch(setTableCode(tableCode));
-      // await dispatch(setRandomVenue(tableCode));
-      await dispatch(getTableById(tableCode));
       navigate(`/table/${tableCode}`);
-    } catch (err) {
-      setError("Invalid table code");
     }
   };
 
   const handleQRCodeScanned = async (code: string) => {
-    try {
-      // Validate if code is a 4-digit number
-      const validCode = /^\d{4}$/.test(code) ? code : "1234";
+    // Validate if code is a 4-digit number
+    const validCode = /^\d{4}$/.test(code) ? code : "1234";
 
-      dispatch(setTableCode(validCode));
-      // await dispatch(setRandomVenue(validCode));
-      await dispatch(getTableById(validCode));
+    dispatch(setTableCode(validCode));
+    const resultAction = await dispatch(updateTableStatus(validCode));
+
+    if (updateTableStatus.fulfilled.match(resultAction)) {
       setQrScannerOpen(false);
       navigate(`/table/${validCode}`);
-    } catch (err) {
-      setError("Invalid QR code");
     }
   };
 
@@ -105,7 +107,9 @@ const TableScan: React.FC = () => {
           </div>
 
           {/* Error Message */}
-          {error && <div className="text-red-300 text-sm">{error}</div>}
+          {tableError && (
+            <div className="text-red-300 text-sm">{tableError}</div>
+          )}
 
           {/* Start Order Button */}
           <button
