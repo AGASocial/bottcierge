@@ -46,7 +46,7 @@ const Orders: React.FC = () => {
               {orders.map((order: Order) => (
                 <div
                   key={order.id}
-                  className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/20"
+                  className="bg-white/5 rounded-lg p-6 border border-white/20"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>

@@ -150,7 +150,7 @@ const Payment: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+          <div className="bg-white/5 rounded-lg p-6 border border-white/10">
             <h2 className="text-lg font-semibold text-white mb-4">
               Order Summary
             </h2>
