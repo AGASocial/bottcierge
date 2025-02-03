@@ -13,7 +13,7 @@ interface TableState {
 const initialState: TableState = {
   tables: [],
   selectedTable: null,
-  currentTableCode: null,
+  currentTableCode: null, // deprecated
   loading: false,
   error: null,
   qrScanning: false,

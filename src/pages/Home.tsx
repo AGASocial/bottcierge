@@ -19,7 +19,7 @@ const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const currentTableCode = useSelector(
-    (state: RootState) => state.table.currentTableCode
+    (state: RootState) => state.table.selectedTable?.number
   );
   const { currentOrder, orderHistory } = useSelector(
     (state: RootState) => state.order

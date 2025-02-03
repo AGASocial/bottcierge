@@ -219,20 +219,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
                   className="w-full p-2 rounded-lg border border-gray-300 bg-white text-gray-900"
                 >
                   {videoInputDevices.map((device) => {
-                    let label = device.label?.toLowerCase() || "";
                     let friendlyName = device.label;
-
-                    // if (label.includes("back") || label.includes("rear")) {
-                    //   friendlyName = label; //'Back Camera';
-                    // } else if (label.includes("front")) {
-                    //   friendlyName = label; //Front Camera';
-                    // } else if (videoInputDevices.length === 2) {
-                    //   // If we have exactly 2 cameras and they're not labeled, assume the first is front and second is back
-                    //   friendlyName =
-                    //     device === videoInputDevices[0]
-                    //       ? "Front Camera"
-                    //       : "Back Camera";
-                    // }
 
                     return (
                       <option key={device.deviceId} value={device.deviceId}>

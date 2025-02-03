@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store';
 import { createServiceRequest } from '../../store/slices/serviceRequestSlice';
+import { selectTable } from '../../store/slices/tableSlice';
 import {
   UserIcon,
   CubeIcon,
   BeakerIcon,
   QuestionMarkCircleIcon,
+  QrCodeIcon,
 } from '@heroicons/react/24/outline';
 
 interface QuickActionButtonProps {
@@ -80,6 +83,7 @@ interface QuickActionsProps {
 }
 
 const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.serviceRequest);
   const { currentOrder } = useSelector((state: RootState) => state.order);
@@ -115,6 +119,15 @@ const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
       label: 'Need Assistance',
       onClick: () => handleServiceRequest('assistance'),
       icon: <QuestionMarkCircleIcon className="h-5 w-5" />,
+      alwaysShow: true,
+    },
+    {
+      label: 'Scan new Table',
+      onClick: () => {
+        dispatch(selectTable(null));
+        navigate('/table/scan');
+      },
+      icon: <QrCodeIcon className="w-6 h-6" />,
       alwaysShow: true,
     },
   ];
