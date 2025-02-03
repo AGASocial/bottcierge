@@ -10,7 +10,7 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/10 backdrop-blur-md rounded-xl shadow-xl text-white border border-white/20;
+    @apply bg-white/10 rounded-xl shadow-xl text-white border border-white/20;
   }
   
   .btn-primary {
