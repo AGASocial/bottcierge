@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
   QrCodeIcon,
   ClipboardDocumentListIcon,
@@ -18,8 +18,8 @@ import { getImageUrl } from "../utils/imageUtils";
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const currentTableCode = useSelector(
-    (state: RootState) => state.table.selectedTable?.number
+  const selectedTable = useSelector(
+    (state: RootState) => state.table.selectedTable
   );
   const { currentOrder, orderHistory } = useSelector(
     (state: RootState) => state.order
@@ -49,8 +49,8 @@ const Home: React.FC = () => {
   }, [allProducts]);
 
   const handleStartOrder = () => {
-    if (currentTableCode) {
-      navigate(`/table/${currentTableCode}`);
+    if (selectedTable?.number) {
+      navigate(`/table/${selectedTable.number}`);
     } else {
       navigate("/table/scan");
     }
@@ -82,7 +82,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Toaster position="top-center" />
       <h1 className="text-3xl font-bold mb-8">Welcome to Bottcierge</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -98,7 +97,7 @@ const Home: React.FC = () => {
             </h2>
           </div>
           <p className="text-gray-300">
-            {currentTableCode
+            {selectedTable?.number
               ? "Continue ordering for your current table"
               : "To start a new order, please enter or scan your table's QR code"}
           </p>
@@ -159,7 +158,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-12">
+      {selectedTable && (<div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button onClick={handleCallStacy} className="btn-primary">
@@ -184,7 +183,7 @@ const Home: React.FC = () => {
             Refill Ice & Mixers
           </button>
         </div>
-      </div>
+      </div>)}
 
       {/* Featured Drinks */}
       <div className="mt-12">

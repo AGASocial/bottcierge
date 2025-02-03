@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { AppDispatch, RootState } from '../../store';
 import { createServiceRequest } from '../../store/slices/serviceRequestSlice';
 import { selectTable } from '../../store/slices/tableSlice';
+import Dialog from '../common/Dialog';
 import {
   UserIcon,
   CubeIcon,
@@ -27,54 +29,44 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   loading = false 
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
-
   const handleClick = async () => {
     if (loading) return;
     
     setIsAnimating(true);
     await onClick();
-    setShowNotification(true);
-
-    // Reset animation after 2 seconds
+    
+    toast.success("Request sent successfully!", {
+      duration: 4000,
+      position: "top-center",
+      style: {
+        background: "#dedede",
+        color: "#000",
+        borderRadius: "10px",
+      },
+    });
+    
     setTimeout(() => {
       setIsAnimating(false);
-      setShowNotification(false);
     }, 2000);
   };
 
   return (
-    <div className="relative">
-      <motion.button
-        onClick={handleClick}
-        disabled={loading}
-        className={`w-full flex items-center justify-center px-4 py-2 rounded-lg text-white
-          ${isAnimating ? 'bg-electric-blue' : 'bg-white/10'} 
-          ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'}
-          backdrop-blur-md border border-white/20
-          transition-all duration-200`}
-        animate={{
-          scale: isAnimating ? 0.95 : 1,
-        }}
-        whileTap={{ scale: loading ? 1 : 0.95 }}
-      >
-        {icon && <span className="mr-2">{icon}</span>}
-        {loading ? 'Sending...' : label}
-      </motion.button>
-
-      <AnimatePresence>
-        {showNotification && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 p-2 bg-electric-blue text-white text-sm rounded-md text-center"
-          >
-            Request sent successfully!
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <motion.button
+      onClick={handleClick}
+      disabled={loading}
+      className={`w-full flex items-center justify-center px-4 py-2 rounded-lg text-white
+        ${isAnimating ? 'bg-electric-blue' : 'bg-white/10'} 
+        ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'}
+        backdrop-blur-md border border-white/20
+        transition-all duration-200`}
+      animate={{
+        scale: isAnimating ? 0.95 : 1,
+      }}
+      whileTap={{ scale: loading ? 1 : 0.95 }}
+    >
+      {icon && <span className="mr-2">{icon}</span>}
+      {loading ? 'Sending...' : label}
+    </motion.button>
   );
 };
 
@@ -87,6 +79,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.serviceRequest);
   const { currentOrder } = useSelector((state: RootState) => state.order);
+  const [showScanDialog, setShowScanDialog] = useState(false);
 
   const handleServiceRequest = async (type: string) => {
     await dispatch(createServiceRequest({ tableId, type }));
@@ -123,10 +116,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
     },
     {
       label: 'Scan new Table',
-      onClick: () => {
-        dispatch(selectTable(null));
-        navigate('/table/scan');
-      },
+      onClick: () => setShowScanDialog(true),
       icon: <QrCodeIcon className="w-6 h-6" />,
       alwaysShow: true,
     },
@@ -137,8 +127,24 @@ const QuickActions: React.FC<QuickActionsProps> = ({ tableId }) => {
     action => action.alwaysShow || hasActiveOrder
   );
 
+  const handleScanNewTable = () => {
+    dispatch(selectTable(null));
+    navigate('/table/scan');
+    setShowScanDialog(false);
+  };
+
   return (
     <div className="glass-card p-6">
+      <Dialog
+        isOpen={showScanDialog}
+        onClose={() => setShowScanDialog(false)}
+        onConfirm={handleScanNewTable}
+        title="Scan New Table"
+        message="Are you sure you want to scan a new table? This will clear your current table selection."
+        confirmText="Yes"
+        cancelText="No"
+        type="warning"
+      />
       <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {visibleActions.map((action) => (
