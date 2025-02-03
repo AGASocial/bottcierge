@@ -130,8 +130,8 @@ const Menu: React.FC = () => {
       <div className="bg-deep-blue sticky top-0 z-10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-white">
+            <div className="flex">
+              <h1 className="text-md md:text-2xl font-bold text-white">
                 {currentVenue?.name || 'Menu'}
               </h1>
             </div>

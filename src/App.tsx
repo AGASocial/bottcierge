@@ -39,7 +39,7 @@ function App() {
       console.log("Received order status update:", update);
 
       // Update the order in Redux store
-      dispatch(updateOrderStatusSocket(update));
+      //////////////// dispatch(updateOrderStatusSocket(update));
 
       // // Fetch fresh order data
       // dispatch(getOrders());

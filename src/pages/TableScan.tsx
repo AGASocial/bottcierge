@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { QrCodeIcon } from '@heroicons/react/24/outline';
-import { getTableById, setTableCode } from '../store/slices/tableSlice';
-import { setRandomVenue } from '../store/slices/venueSlice';
-import QRScanner from '../components/scanner/QRScanner';
-import type { AppDispatch } from '../store';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
+import { getTableById, setTableCode } from "../store/slices/tableSlice";
+import { setRandomVenue } from "../store/slices/venueSlice";
+import QRScanner from "../components/scanner/QRScanner";
+import type { AppDispatch, RootState } from "../store";
 
 const TableScan: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [tableCode, setTableCodeState] = useState('');
+  const { currentVenue } = useSelector((state: RootState) => state.venue);
+  const [tableCode, setTableCodeState] = useState("");
   const [partySize, setPartySize] = useState(2);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,43 +19,48 @@ const TableScan: React.FC = () => {
   const handleTableCodeSubmit = async () => {
     try {
       if (!tableCode.trim()) {
-        setError('Please enter a table code');
+        setError("Please enter a table code");
         return;
       }
 
       dispatch(setTableCode(tableCode));
-      await dispatch(setRandomVenue(tableCode));
+      // await dispatch(setRandomVenue(tableCode));
       await dispatch(getTableById(tableCode));
       navigate(`/table/${tableCode}`);
     } catch (err) {
-      setError('Invalid table code');
+      setError("Invalid table code");
     }
   };
 
   const handleQRCodeScanned = async (code: string) => {
     try {
       // Validate if code is a 4-digit number
-      const validCode = /^\d{4}$/.test(code) ? code : '1234';
-      
+      const validCode = /^\d{4}$/.test(code) ? code : "1234";
+
       dispatch(setTableCode(validCode));
-      await dispatch(setRandomVenue(validCode));
+      // await dispatch(setRandomVenue(validCode));
       await dispatch(getTableById(validCode));
       setQrScannerOpen(false);
       navigate(`/table/${validCode}`);
     } catch (err) {
-      setError('Invalid QR code');
+      setError("Invalid QR code");
     }
   };
 
   return (
     <div className="min-h-screen bg-deep-blue py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto glass-card p-6">
-        <h1 className="text-2xl font-bold text-center mb-8">Welcome to Bottcierge</h1>
+        <h1 className="text-2xl font-bold text-center mb-8">
+          Welcome to Bottcierge
+        </h1>
 
         <div className="space-y-6">
           {/* Table Code Input */}
           <div>
-            <label htmlFor="tableCode" className="block text-sm font-medium text-light-blue">
+            <label
+              htmlFor="tableCode"
+              className="block text-sm font-medium text-light-blue"
+            >
               Table Code
             </label>
             <div className="mt-1 flex space-x-3">
@@ -78,7 +84,10 @@ const TableScan: React.FC = () => {
 
           {/* Party Size Selection */}
           <div>
-            <label htmlFor="partySize" className="block text-sm font-medium text-light-blue">
+            <label
+              htmlFor="partySize"
+              className="block text-sm font-medium text-light-blue"
+            >
               Number of People
             </label>
             <select
@@ -89,18 +98,14 @@ const TableScan: React.FC = () => {
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                 <option key={num} value={num}>
-                  {num} {num === 1 ? 'person' : 'people'}
+                  {num} {num === 1 ? "person" : "people"}
                 </option>
               ))}
             </select>
           </div>
 
           {/* Error Message */}
-          {error && (
-            <div className="text-red-300 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-300 text-sm">{error}</div>}
 
           {/* Start Order Button */}
           <button
