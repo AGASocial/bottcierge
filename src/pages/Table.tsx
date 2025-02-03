@@ -138,14 +138,26 @@ const Table: React.FC = () => {
             </div>
             <div className="space-y-2 text-white/90">
               <p>
-                Capacity: ${currentTable?.capacity.minimum}-$
+                Capacity: {currentTable?.capacity.minimum} -{" "}
                 {currentTable?.capacity.maximum} people
               </p>
-              {currentTable?.status && (
+              {currentTable && (
                 <p>
                   Status:{" "}
                   {currentTable.status.charAt(0).toUpperCase() +
                     currentTable.status.slice(1)}
+                </p>
+              )}
+              {currentTable && (
+                <p>
+                  Minimum Spend:{" "}
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    minimumFractionDigits: 0,
+                  }).format(
+                    currentVenue?.pricingRules[currentTable?.section] || 0
+                  )}
                 </p>
               )}
             </div>

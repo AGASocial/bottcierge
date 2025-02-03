@@ -6,6 +6,10 @@ import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 interface ReceiptState {
   success: boolean;
   total: number;
+  subtotal: number;
+  tax: number;
+  defaultTip: number;
+  additionalTip: number;
   method: "card" | "cash";
   transactionId?: string;
   timestamp?: string;
@@ -85,7 +89,7 @@ const Receipt: React.FC = () => {
               <h3 className="text-lg font-semibold text-white mb-4">
                 Order Summary
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {state.items.map((item, index) => (
                   <div key={index} className="flex justify-between text-white">
                     <span>
@@ -94,10 +98,32 @@ const Receipt: React.FC = () => {
                     <span>${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
-                <div className="border-t border-white/20 pt-4 mt-4">
-                  <div className="flex justify-between font-semibold text-lg text-white">
+                <div className="space-y-2  mt-4 pt-4 border-t border-white/20 text-white">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>${state.subtotal?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tax (18%)</span>
+                    <span>${state.tax?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Default Tip (20%)</span>
+                    <span>${state.defaultTip?.toFixed(2)}</span>
+                  </div>
+                  {state.additionalTip > 0 && (
+                    <div className="flex justify-between">
+                      <span>Additional Tip</span>
+                      <span>${state.additionalTip?.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Total Tip</span>
+                    <span>${(state.defaultTip + state.additionalTip)?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-lg mt-4 pt-4">
                     <span>Total</span>
-                    <span>${state.total.toFixed(2)}</span>
+                    <span>${state.total?.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

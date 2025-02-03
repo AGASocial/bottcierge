@@ -48,8 +48,20 @@ const Payment: React.FC = () => {
     return calculateSubtotal() * 0.18;
   };
 
+  const calculateDefaultTip = () => {
+    return (calculateSubtotal() + calculateTax()) * 0.2;
+  };
+
+  const calculateAdditionalTip = () => {
+    return currentOrder?.additionalTip || 0;
+  };
+
+  const calculateTotalTip = () => {
+    return calculateDefaultTip() + calculateAdditionalTip();
+  };
+
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
+    return calculateSubtotal() + calculateTax() + calculateTotalTip();
   };
 
   const handlePayment = async () => {
@@ -73,6 +85,10 @@ const Payment: React.FC = () => {
         state: {
           success: result.success,
           total: calculateTotal(),
+          subtotal: calculateSubtotal(),
+          tax: calculateTax(),
+          defaultTip: calculateDefaultTip(),
+          additionalTip: calculateAdditionalTip(),
           method: selectedMethod,
           transactionId: result.transactionId,
           timestamp: result.timestamp,
@@ -88,6 +104,10 @@ const Payment: React.FC = () => {
         state: {
           success: false,
           total: calculateTotal(),
+          subtotal: calculateSubtotal(),
+          tax: calculateTax(),
+          defaultTip: calculateDefaultTip(),
+          additionalTip: calculateAdditionalTip(),
           method: selectedMethod,
           error: errorMessage,
           orderId: currentOrder.id,
@@ -168,6 +188,20 @@ const Payment: React.FC = () => {
               <div className="flex justify-between">
                 <span>Tax (18%)</span>
                 <span>${calculateTax().toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Default Tip (20%)</span>
+                <span>${calculateDefaultTip().toFixed(2)}</span>
+              </div>
+              {currentOrder?.additionalTip ? (
+                <div className="flex justify-between">
+                  <span>Additional Tip</span>
+                  <span>${currentOrder.additionalTip.toFixed(2)}</span>
+                </div>
+              ) : null}
+              <div className="flex justify-between">
+                <span>Total Tip</span>
+                <span>${calculateTotalTip().toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-semibold text-lg mt-4 pt-4 border-t border-white/20">
                 <span>Total</span>

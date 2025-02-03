@@ -9,40 +9,6 @@ import type {
   PricingRule,
 } from "../../types";
 
-const defaultVenue: Venue = {
-  id: "d6a2ed83-30d5-419c-ad3f-0e837d7fcb94",
-  name: "The Purple Lounge",
-  address: "123 Main St",
-  city: "Austin",
-  state: "TX",
-  zipCode: "78701",
-  phoneNumber: "(512) 555-0123",
-  email: "info@purplelounge.com",
-  description: "A sophisticated nightclub in downtown Austin",
-  timezone: "America/Chicago",
-  taxRate: 8.25,
-  operatingHours: [
-    { dayOfWeek: 1, open: "18:00", close: "02:00", isOpen: true }, // Monday
-    { dayOfWeek: 2, open: "18:00", close: "02:00", isOpen: true }, // Tuesday
-    { dayOfWeek: 3, open: "18:00", close: "02:00", isOpen: true }, // Wednesday
-    { dayOfWeek: 4, open: "18:00", close: "02:00", isOpen: true }, // Thursday
-    { dayOfWeek: 5, open: "18:00", close: "03:00", isOpen: true }, // Friday
-    { dayOfWeek: 6, open: "18:00", close: "03:00", isOpen: true }, // Saturday
-    { dayOfWeek: 0, open: "18:00", close: "02:00", isOpen: true }, // Sunday
-  ],
-  status: "open",
-  type: "nightclub",
-  capacity: 300,
-  sections: [
-    { id: "main-floor", name: "Main Floor" },
-    { id: "vip-area", name: "VIP Area" },
-    { id: "rooftop", name: "Rooftop" },
-  ],
-  amenities: ["vip-service", "dance-floor", "smoking-area"],
-  rating: 4.5,
-  tables: [],
-};
-
 interface VenueState {
   currentVenue: Venue | null;
   staff: Staff[];
@@ -67,7 +33,7 @@ interface VenueState {
 }
 
 const initialState: VenueState = {
-  currentVenue: defaultVenue,
+  currentVenue: null,
   staff: [],
   sections: [],
   events: [],
@@ -104,21 +70,9 @@ export const fetchVenueDetails = createAsyncThunk(
   "venue/fetchDetails",
   async (venueId: string, { rejectWithValue }) => {
     try {
-      const [venueRes, staffRes, sectionsRes, eventsRes, pricingRes] =
-        await Promise.all([
-          api.get(`/venues/${venueId}`),
-          api.get(`/venues/${venueId}/staff`),
-          api.get(`/venues/${venueId}/sections`),
-          api.get(`/venues/${venueId}/events`),
-          api.get(`/venues/${venueId}/pricing-rules`),
-        ]);
-
+      const venueRes = await api.get(`/venues/${venueId}`);
       return {
         venue: venueRes.data,
-        staff: staffRes.data,
-        sections: sectionsRes.data,
-        events: eventsRes.data,
-        pricingRules: pricingRes.data,
       };
     } catch (error: any) {
       return rejectWithValue(
@@ -214,10 +168,6 @@ const venueSlice = createSlice({
       .addCase(fetchVenueDetails.fulfilled, (state, action) => {
         state.loading = false;
         state.currentVenue = action.payload.venue;
-        state.staff = action.payload.staff;
-        state.sections = action.payload.sections;
-        state.events = action.payload.events;
-        state.pricingRules = action.payload.pricingRules;
       })
       .addCase(fetchVenueDetails.rejected, (state, action) => {
         state.loading = false;
