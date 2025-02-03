@@ -8,7 +8,6 @@ import {
   updateTableStatus,
   setTableError,
 } from "../store/slices/tableSlice";
-import { setRandomVenue } from "../store/slices/venueSlice";
 import QRScanner from "../components/scanner/QRScanner";
 import type { AppDispatch, RootState } from "../store";
 
