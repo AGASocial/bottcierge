@@ -119,12 +119,12 @@ const Table: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-white/20">
+            <div className="glass-card p-6">
               <div className="flex items-center mb-4">
-                <UsersIcon className="h-6 w-6 mr-2 text-light-blue" />
-                <h2 className="text-lg font-semibold">Table Information</h2>
+                <UsersIcon className="h-6 w-6 mr-2 text-white" />
+                <h2 className="text-lg font-semibold text-white">Table Information</h2>
               </div>
-              <div className="space-y-2 text-light-blue">
+              <div className="space-y-2 text-white/90">
                 <p>Capacity: {currentTable?.capacity} people</p>
                 {currentTable?.status && (
                   <p>Status: {currentTable.status.charAt(0).toUpperCase() + currentTable.status.slice(1)}</p>

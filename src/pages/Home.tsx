@@ -162,7 +162,7 @@ const Home: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button onClick={handleCallStacy} className="btn-primary">
-            Call Stacy
+            Call Server
           </button>
           <button
             onClick={() => handleRefill("Ice is on the way!")}
