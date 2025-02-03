@@ -2,12 +2,12 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'staff' | 'customer';
+  role: "admin" | "staff" | "customer";
 }
 
 export interface PaymentMethod {
   id: string;
-  type: 'credit_card' | 'apple_pay' | 'google_pay';
+  type: "credit_card" | "apple_pay" | "google_pay";
   lastFour: string;
   token: string;
   isDefault: boolean;
@@ -45,17 +45,27 @@ export interface OrderItem {
   quantity: number;
   size: Size;
   options: Record<string, string | string[]>;
-  status: 'pending' | 'preparing' | 'ready' | 'delivered';
+  status: "pending" | "preparing" | "ready" | "delivered";
 }
 
-export type OrderStatus =
-  | 'draft'      // Initial state when user is adding items
-  | 'paid'       // Payment has been processed successfully
-  | 'accepted'   // Club has acknowledged the order
-  | 'preparing'  // Club is preparing the drinks/items
-  | 'serving'    // Order is being served/delivered to the table
-  | 'completed'  // Order has been delivered and completed
-  | 'cancelled'; // Order has been cancelled (can happen at any point)
+export type OrderStatusType =
+  | "draft" // Initial state when user is adding items
+  | "paid" // Payment has been processed successfully
+  | "accepted" // Club has acknowledged the order
+  | "preparing" // Club is preparing the drinks/items
+  | "serving" // Order is being served/delivered to the table
+  | "completed" // Order has been delivered and completed
+  | "cancelled"; // Order has been cancelled (can happen at any point)
+
+export enum OrderStatus {
+  DRAFT = "draft",
+  PAID = "paid",
+  ACCEPTED = "accepted",
+  PREPARING = "preparing",
+  SERVING = "serving",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
+}
 
 export interface Order {
   id: string;
@@ -77,7 +87,7 @@ export interface Product {
   image?: string;
   category: string;
   brand: string;
-  status: 'available' | 'out_of_stock';
+  status: "available" | "out_of_stock";
   section: string;
   brandId: string;
   type: string;
@@ -96,7 +106,7 @@ export interface MenuCategory {
   displayOrder: number;
   isActive: boolean;
   parentCategoryId?: string;
-  type: 'food' | 'beverage';
+  type: "food" | "beverage";
 }
 
 export interface Category {
@@ -133,8 +143,7 @@ export enum TableType {
   CORNER = "corner",
   HIGH_TOP = "high_top",
   SHARED = "shared",
-  BOOTH = "booth"
-  
+  BOOTH = "booth",
 }
 
 export interface Table {
@@ -194,8 +203,8 @@ export interface Venue {
   phoneNumber: string;
   timezone: string;
   taxRate: number;
-  status: 'open' | 'active' | 'closed' | 'special_event';
-  type: 'bar' | 'restaurant' | 'cafe' | 'nightclub';
+  status: "open" | "active" | "closed" | "special_event";
+  type: "bar" | "restaurant" | "cafe" | "nightclub";
   capacity: number;
   operatingHours: OperatingHours[];
   sections: Section[];
@@ -249,10 +258,10 @@ export interface Staff {
   id: string;
   firstName: string;
   lastName: string;
-  role: 'manager' | 'server' | 'bartender';
+  role: "manager" | "server" | "bartender";
   sections: string[];
   isActive: boolean;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
   metrics: {
     averageRating: number;
     ordersServed: number;

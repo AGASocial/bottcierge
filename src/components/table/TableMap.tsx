@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getTables } from '../../store/slices/tableSlice';
+import { getTablesByVenueId } from '../../store/slices/tableSlice';
 import type { Table } from '../../types';
 import type { AppDispatch, RootState } from '../../store';
+import { DEFAULT_VENUE_ID } from '@/utils/orderConstants';
 
 interface TableMapProps {
   onTableSelect?: (table: Table) => void;
@@ -15,7 +16,7 @@ const TableMap: React.FC<TableMapProps> = ({ onTableSelect }) => {
   const { tables } = useSelector((state: RootState) => state.table);
 
   useEffect(() => {
-    dispatch(getTables());
+    dispatch(getTablesByVenueId(DEFAULT_VENUE_ID));
   }, [dispatch]);
 
   const handleTableClick = (table: Table) => {
@@ -62,7 +63,7 @@ const TableMap: React.FC<TableMapProps> = ({ onTableSelect }) => {
               <span className="text-sm capitalize">{table.status}</span>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              Capacity: {table.capacity}
+              Capacity: {table.capacity.minimum} - {table.capacity.maximum}
             </div>
           </div>
         </button>
