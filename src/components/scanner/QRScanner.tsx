@@ -8,9 +8,18 @@ interface QRScannerProps {
   onClose: () => void;
   onScan: (result: string) => void;
   onError?: (error: Error) => void;
+  onScannedResult?: (result: string | null) => void;
+  defaultScannedResult?: string | null;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError }) => {
+const QRScanner: React.FC<QRScannerProps> = ({ 
+  isOpen, 
+  onClose, 
+  onScan, 
+  onError, 
+  onScannedResult, 
+  defaultScannedResult = null 
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -18,6 +27,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
   const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [error, setError] = useState<string>('');
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scannedResult, setScannedResult] = useState<string | null>(defaultScannedResult);
 
   const requestCameraPermission = async () => {
     try {
@@ -67,7 +77,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
         videoRef.current,
         (result) => {
           if (result) {
-            onScan(result.getText());
+            const text = result.getText();
+            setScannedResult(text);
+            onScan(text);
+            if (onScannedResult) onScannedResult(text);
             stopScanning();
             onClose();
           }
@@ -188,11 +201,25 @@ const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError 
                   }}
                   className="w-full p-2 rounded-lg border border-gray-300 bg-white text-gray-900"
                 >
-                  {videoInputDevices.map((device) => (
-                    <option key={device.deviceId} value={device.deviceId}>
-                      {device.label || `Camera ${device.deviceId.slice(0, 5)}...`}
-                    </option>
-                  ))}
+                  {videoInputDevices.map((device) => {
+                    let label = device.label?.toLowerCase() || '';
+                    let friendlyName = 'Camera';
+                    
+                    if (label.includes('back') || label.includes('rear')) {
+                      friendlyName = 'Back Camera';
+                    } else if (label.includes('front')) {
+                      friendlyName = 'Front Camera';
+                    } else if (videoInputDevices.length === 2) {
+                      // If we have exactly 2 cameras and they're not labeled, assume the first is front and second is back
+                      friendlyName = device === videoInputDevices[0] ? 'Front Camera' : 'Back Camera';
+                    }
+                    
+                    return (
+                      <option key={device.deviceId} value={device.deviceId}>
+                        {friendlyName}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}

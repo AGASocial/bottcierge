@@ -33,11 +33,14 @@ const TableScan: React.FC = () => {
 
   const handleQRCodeScanned = async (code: string) => {
     try {
-      dispatch(setTableCode(code));
-      await dispatch(setRandomVenue(code));
-      await dispatch(getTableById(code));
+      // Validate if code is a 4-digit number
+      const validCode = /^\d{4}$/.test(code) ? code : '1234';
+      
+      dispatch(setTableCode(validCode));
+      await dispatch(setRandomVenue(validCode));
+      await dispatch(getTableById(validCode));
       setQrScannerOpen(false);
-      navigate(`/table/${code}`);
+      navigate(`/table/${validCode}`);
     } catch (err) {
       setError('Invalid QR code');
     }
