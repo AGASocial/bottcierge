@@ -48,7 +48,7 @@ const TableScan: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-deep-blue py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 text-white border border-white/20">
+      <div className="max-w-md mx-auto glass-card p-6">
         <h1 className="text-2xl font-bold text-center mb-8">Welcome to Bottcierge</h1>
 
         <div className="space-y-6">
