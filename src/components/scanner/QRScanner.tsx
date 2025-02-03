@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser';
-import { ArrowPathIcon, CameraIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
+import {
+  ArrowPathIcon,
+  CameraIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QRScannerProps {
   isOpen: boolean;
@@ -12,40 +16,46 @@ interface QRScannerProps {
   defaultScannedResult?: string | null;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({ 
-  isOpen, 
-  onClose, 
-  onScan, 
-  onError, 
-  onScannedResult, 
-  defaultScannedResult = null 
+const QRScanner: React.FC<QRScannerProps> = ({
+  isOpen,
+  onClose,
+  onScan,
+  onError,
+  onScannedResult,
+  defaultScannedResult = null,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
-  const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [error, setError] = useState<string>('');
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
+  const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>(
+    []
+  );
+  const [error, setError] = useState<string>("");
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scannedResult, setScannedResult] = useState<string | null>(defaultScannedResult);
+  const [scannedResult, setScannedResult] = useState<string | null>(
+    defaultScannedResult
+  );
 
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop()); // Stop the stream after getting permission
+      stream.getTracks().forEach((track) => track.stop()); // Stop the stream after getting permission
       setHasPermission(true);
       return true;
     } catch (error) {
       setHasPermission(false);
-      setError('Camera permission denied. Please allow camera access to scan QR codes.');
-      if (onError) onError(new Error('Camera permission denied'));
+      setError(
+        "Camera permission denied. Please allow camera access to scan QR codes."
+      );
+      if (onError) onError(new Error("Camera permission denied"));
       return false;
     }
   };
 
   const startScanning = async () => {
     try {
-      setError('');
+      setError("");
       if (!videoRef.current) return;
 
       // First check if we have permission
@@ -53,24 +63,28 @@ const QRScanner: React.FC<QRScannerProps> = ({
       if (!hasPermissionResult) return;
 
       const codeReader = new BrowserQRCodeReader();
-      
+
       // Get list of video devices
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      const videoDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
       setVideoInputDevices(videoDevices);
 
       // Use the first available device if none selected
       const deviceId = selectedDeviceId || videoDevices[0]?.deviceId;
-      
+
       if (!deviceId) {
-        const noDeviceError = new Error('No camera found. Please make sure your device has a camera.');
+        const noDeviceError = new Error(
+          "No camera found. Please make sure your device has a camera."
+        );
         setError(noDeviceError.message);
         if (onError) onError(noDeviceError);
         return;
       }
 
       setIsScanning(true);
-      
+
       // Start scanning with selected device
       controlsRef.current = await codeReader.decodeFromVideoDevice(
         deviceId,
@@ -91,7 +105,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       if (error instanceof Error && onError) {
         onError(error);
       }
-      console.error('Error starting QR scanner:', error);
+      console.error("Error starting QR scanner:", error);
     }
   };
 
@@ -162,7 +176,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
                 <p className="text-red-200 text-sm">{error}</p>
                 <button
                   onClick={() => {
-                    setError('');
+                    setError("");
                     startScanning();
                   }}
                   className="mt-2 text-sm text-red-200 hover:text-white flex items-center gap-1"
@@ -174,15 +188,18 @@ const QRScanner: React.FC<QRScannerProps> = ({
             )}
 
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden mb-4">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-              />
+              <video ref={videoRef} className="w-full h-full object-cover" />
               {!isScanning && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                   <div className="text-center text-white">
                     <CameraIcon className="h-12 w-12 mx-auto mb-2" />
-                    <p>{hasPermission === false ? 'Camera access denied' : hasPermission === null ? 'Camera permission needed' : 'Camera is off'}</p>
+                    <p>
+                      {hasPermission === false
+                        ? "Camera access denied"
+                        : hasPermission === null
+                        ? "Camera permission needed"
+                        : "Camera is off"}
+                    </p>
                   </div>
                 </div>
               )}
@@ -202,18 +219,21 @@ const QRScanner: React.FC<QRScannerProps> = ({
                   className="w-full p-2 rounded-lg border border-gray-300 bg-white text-gray-900"
                 >
                   {videoInputDevices.map((device) => {
-                    let label = device.label?.toLowerCase() || '';
-                    let friendlyName = 'Camera';
-                    
-                    if (label.includes('back') || label.includes('rear')) {
-                      friendlyName = 'Back Camera';
-                    } else if (label.includes('front')) {
-                      friendlyName = 'Front Camera';
+                    let label = device.label?.toLowerCase() || "";
+                    let friendlyName = "Camera";
+
+                    if (label.includes("back") || label.includes("rear")) {
+                      friendlyName = label; //'Back Camera';
+                    } else if (label.includes("front")) {
+                      friendlyName = label; //Front Camera';
                     } else if (videoInputDevices.length === 2) {
                       // If we have exactly 2 cameras and they're not labeled, assume the first is front and second is back
-                      friendlyName = device === videoInputDevices[0] ? 'Front Camera' : 'Back Camera';
+                      friendlyName =
+                        device === videoInputDevices[0]
+                          ? "Front Camera"
+                          : "Back Camera";
                     }
-                    
+
                     return (
                       <option key={device.deviceId} value={device.deviceId}>
                         {friendlyName}
