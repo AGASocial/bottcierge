@@ -94,91 +94,89 @@ const Table: React.FC = () => {
   const canStartOrder = !isCreatingOrder && !currentOrder;
 
   return (
-    <div className="min-h-screen bg-deep-blue">
-      <div className="container mx-auto px-4 py-8 text-white">
-        <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 border border-white/20">
-          {orderError && (
-            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
-              {orderError}
-            </div>
-          )}
+    <div className="min-h-screen bg-deep-blue py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto glass-card p-6">
+        {orderError && (
+          <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
+            {orderError}
+          </div>
+        )}
 
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">
-                Table {currentTable?.number}
-              </h1>
-              <p className="text-light-blue">Welcome! Ready to order?</p>
-              {renderTableStatus(currentTable)}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">
+              Table {currentTable?.number}
+            </h1>
+            <p className="text-light-blue">Welcome! Ready to order?</p>
+            {renderTableStatus(currentTable)}
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => navigate("/cart")}
+              className="inline-flex items-center px-4 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-md text-white bg-white/5 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
+            >
+              <ShoppingCartIcon className="h-5 w-5 mr-2" />
+              View Cart
+              {currentOrder && currentOrder.items.length > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-light-blue rounded-full">
+                  {currentOrder.items.reduce(
+                    (total, item) => total + item.quantity,
+                    0
+                  )}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+            <div className="flex items-center mb-4">
+              <UsersIcon className="h-6 w-6 mr-2 text-white" />
+              <h2 className="text-lg font-semibold text-white">
+                Table Information
+              </h2>
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => navigate("/cart")}
-                className="inline-flex items-center px-4 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-md text-white bg-white/5 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
-              >
-                <ShoppingCartIcon className="h-5 w-5 mr-2" />
-                View Cart
-                {currentOrder && currentOrder.items.length > 0 && (
-                  <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-light-blue rounded-full">
-                    {currentOrder.items.reduce(
-                      (total, item) => total + item.quantity,
-                      0
-                    )}
-                  </span>
-                )}
-              </button>
+            <div className="space-y-2 text-white/90">
+              <p>Capacity: {currentTable?.capacity} people</p>
+              {currentTable?.status && (
+                <p>
+                  Status:{" "}
+                  {currentTable.status.charAt(0).toUpperCase() +
+                    currentTable.status.slice(1)}
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="glass-card p-6">
-              <div className="flex items-center mb-4">
-                <UsersIcon className="h-6 w-6 mr-2 text-white" />
-                <h2 className="text-lg font-semibold text-white">
-                  Table Information
-                </h2>
-              </div>
-              <div className="space-y-2 text-white/90">
-                <p>Capacity: {currentTable?.capacity} people</p>
-                {currentTable?.status && (
-                  <p>
-                    Status:{" "}
-                    {currentTable.status.charAt(0).toUpperCase() +
-                      currentTable.status.slice(1)}
-                  </p>
-                )}
-              </div>
-            </div>
+          {/* Add QuickActions component */}
+          <QuickActions tableId={currentTable.id} />
+        </div>
 
-            {/* Add QuickActions component */}
-            <QuickActions tableId={currentTable.id} />
-          </div>
-
-          <div className="mt-6">
-            {canStartOrder ? (
-              <button
-                onClick={handleStartOrder}
-                disabled={isCreatingOrder}
-                className={`w-full flex justify-center py-3 px-4 border border-white/20 rounded-md shadow-sm text-sm font-medium text-white 
+        <div className="mt-6">
+          {canStartOrder ? (
+            <button
+              onClick={handleStartOrder}
+              disabled={isCreatingOrder}
+              className={`w-full flex justify-center py-3 px-4 border border-white/20 rounded-md shadow-sm text-sm font-medium text-white 
                   ${
                     isCreatingOrder
                       ? "bg-white/20 cursor-not-allowed"
                       : "bg-white/5 hover:bg-light-blue"
                   } 
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue`}
-              >
-                {isCreatingOrder ? "Creating Order..." : "Start Order"}
-              </button>
-            ) : currentOrder ? (
-              <button
-                onClick={handleAddMoreItems}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-white/5 hover:bg-light-blue rounded-md 
+            >
+              {isCreatingOrder ? "Creating Order..." : "Start Order"}
+            </button>
+          ) : currentOrder ? (
+            <button
+              onClick={handleAddMoreItems}
+              className="w-full px-4 py-2 text-sm font-medium text-white bg-white/5 hover:bg-light-blue rounded-md 
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue"
-              >
-                Add more items
-              </button>
-            ) : null}
-          </div>
+            >
+              Add more items
+            </button>
+          ) : null}
         </div>
       </div>
 
