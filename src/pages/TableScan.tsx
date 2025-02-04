@@ -10,11 +10,13 @@ import {
 } from "../store/slices/tableSlice";
 import QRScanner from "../components/scanner/QRScanner";
 import type { AppDispatch, RootState } from "../store";
+import { DEFAULT_USER_ID } from "@/utils/orderConstants";
 
 const TableScan: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { currentVenue } = useSelector((state: RootState) => state.venue);
+  const { currentUser } = useSelector((state: RootState) => state.auth);
   const { error: tableError } = useSelector((state: RootState) => state.table);
   const [tableCode, setTableCodeState] = useState("");
   const [partySize, setPartySize] = useState(2);
@@ -27,7 +29,7 @@ const TableScan: React.FC = () => {
     }
 
     
-    const resultAction = await dispatch(updateTableStatus(tableCode));
+    const resultAction = await dispatch(updateTableStatus({ tableId: tableCode, userId: DEFAULT_USER_ID }));
     console.log(resultAction);
     if (updateTableStatus.fulfilled.match(resultAction)) {
       dispatch(setTableCode(tableCode));
@@ -40,7 +42,7 @@ const TableScan: React.FC = () => {
     const validCode = /^\d{4}$/.test(code) ? code : "1234";
 
     dispatch(setTableCode(validCode));
-    const resultAction = await dispatch(updateTableStatus(validCode));
+    const resultAction = await dispatch(updateTableStatus({ tableId: validCode, userId: DEFAULT_USER_ID }));
 
     if (updateTableStatus.fulfilled.match(resultAction)) {
       setQrScannerOpen(false);

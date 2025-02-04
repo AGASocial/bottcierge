@@ -21,15 +21,21 @@ import { websocketService } from "./services/websocketService";
 import { getOrders, updateOrderStatusSocket } from "./store/slices/orderSlice";
 import type { AppDispatch, RootState } from "./store";
 import { fetchVenueDetails } from "./store/slices/venueSlice";
-import { DEFAULT_VENUE_ID } from "./utils/orderConstants";
+import { DEFAULT_USER_ID, DEFAULT_VENUE_ID } from "./utils/orderConstants";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { orderHistory } = useSelector((state: RootState) => state.order);
 
   useEffect(() => {
-    // dispatch(getCurrentUser());
-    dispatch(fetchVenueDetails(DEFAULT_VENUE_ID)); // Add this line
+    dispatch(fetchVenueDetails(DEFAULT_VENUE_ID));
+    dispatch(getCurrentUser());
+
+    // Only get current user if we have a token
+    // localStorage.setItem("token", DEFAULT_USER_ID);
+    // const token = localStorage.getItem("token");
+    // if (token) {
+    // }
 
     // Initialize WebSocket connection
     websocketService.initialize(dispatch);

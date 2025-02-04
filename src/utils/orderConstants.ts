@@ -1,6 +1,7 @@
 import type { OrderStatus, OrderStatusType } from "../types/";
 
 export const DEFAULT_VENUE_ID = "d6a2ed83-30d5-419c-ad3f-0e837d7fcb94";
+export const DEFAULT_USER_ID = "42a65e28-323c-4147-a979-acc6fb10c20c";
 
 export const ORDER_STATUS_COLORS: Record<OrderStatusType, string> = {
   draft: "bg-amber-500", // Warm yellow for draft

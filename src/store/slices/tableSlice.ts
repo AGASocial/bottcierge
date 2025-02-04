@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import api from "../../services/api";
-import type { Table } from "../../types";
+import { TableStatus, type Table } from "../../types";
 
 interface TableState {
   tables: Table[];
@@ -34,11 +34,19 @@ export const getTablesByVenueId = createAsyncThunk(
   }
 );
 
+interface UpdateTableStatusParams {
+  tableId: string;
+  userId: string;
+}
+
 export const updateTableStatus = createAsyncThunk(
   "table/updateTableStatus",
-  async (tableId: string, { rejectWithValue }) => {
+  async ({ tableId, userId }: UpdateTableStatusParams, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/tables/${tableId}/status`);
+      const response = await api.patch(`/tables/${tableId}/status`, {
+        status: TableStatus.OCCUPIED,
+        userId,
+      });
       console.log(response.data);
       return response.data;
     } catch (error: any) {
