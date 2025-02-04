@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
 import {
   getTableById,
@@ -15,12 +15,20 @@ import { DEFAULT_USER_ID } from "@/utils/orderConstants";
 const TableScan: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentVenue } = useSelector((state: RootState) => state.venue);
   const { currentUser } = useSelector((state: RootState) => state.auth);
   const { error: tableError } = useSelector((state: RootState) => state.table);
   const [tableCode, setTableCodeState] = useState("");
   const [partySize, setPartySize] = useState(2);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
+
+  useEffect(() => {
+    const code = searchParams.get("tableCode");
+    if (code) {
+      setTableCodeState(code);
+    }
+  }, [searchParams]);
 
   const handleTableCodeSubmit = async () => {
     if (!tableCode.trim()) {
