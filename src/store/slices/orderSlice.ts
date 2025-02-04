@@ -31,7 +31,7 @@ const initialState: OrderState = {
 
 export const createOrder = createAsyncThunk(
   "order/createOrder",
-  async (orderData: { venueId: string; tableId: string; type: string }) => {
+  async (orderData: { venueId: string; tableId: string; userId:string, type: string }) => {
     const response = await api.post("/orders", orderData);
     return response.data;
   }

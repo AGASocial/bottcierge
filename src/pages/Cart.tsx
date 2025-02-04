@@ -19,7 +19,11 @@ import type { RootState, AppDispatch } from "../store";
 const Cart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { currentOrder } = useSelector((state: RootState) => state.order);
+  const { currentOrder, orderHistory } = useSelector(
+    (state: RootState) => state.order
+  );
+  const { currentVenue } = useSelector((state: RootState) => state.venue);
+  const { currentTable } = useSelector((state: RootState) => state.table);
 
   const total =
     currentOrder?.items.reduce(
@@ -86,7 +90,7 @@ const Cart: React.FC = () => {
   };
 
   const calculateDefaultTip = () => {
-    return (calculateSubtotal() + calculateTax()) * 0.20;
+    return (calculateSubtotal() + calculateTax()) * 0.2;
   };
 
   const calculateAdditionalTip = () => {
@@ -103,9 +107,11 @@ const Cart: React.FC = () => {
 
   const [localTip, setLocalTip] = React.useState<string>("");
 
-  const handleAdditionalTipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAdditionalTipChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (!currentOrder) return;
-    
+
     const value = e.target.value;
     if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
       setLocalTip(value);
@@ -205,14 +211,22 @@ const Cart: React.FC = () => {
                       onBlur={async () => {
                         if (!currentOrder) return;
                         try {
-                          await dispatch(updateOrder({
-                            id: currentOrder.id,
-                            additionalTip: localTip === "" ? 0 : parseFloat(localTip)
-                          })).unwrap();
+                          await dispatch(
+                            updateOrder({
+                              id: currentOrder.id,
+                              additionalTip:
+                                localTip === "" ? 0 : parseFloat(localTip),
+                            })
+                          ).unwrap();
                         } catch (error) {
-                          console.error('Failed to update additional tip:', error);
+                          console.error(
+                            "Failed to update additional tip:",
+                            error
+                          );
                           // Reset to current value on error
-                          setLocalTip(currentOrder.additionalTip?.toString() || "");
+                          setLocalTip(
+                            currentOrder.additionalTip?.toString() || ""
+                          );
                         }
                       }}
                       onChange={handleAdditionalTipChange}
@@ -229,6 +243,16 @@ const Cart: React.FC = () => {
                   <span>Total</span>
                   <span>${calculateTotal().toFixed(2)}</span>
                 </div>
+                {orderHistory.length === 0 &&
+                  currentTable &&
+                  Number(currentVenue?.pricingRules[currentTable.section]) >
+                    calculateSubtotal() && (
+                    <div className="text-red-500 text-center pt-4">
+                      Table minimum: $
+                      {currentVenue?.pricingRules[currentTable.section]}, please
+                      add more items
+                    </div>
+                  )}
               </div>
 
               <div className="flex gap-4">
@@ -238,12 +262,18 @@ const Cart: React.FC = () => {
                 >
                   Add More Items
                 </button>
-                <button
-                  onClick={handleCheckout}
-                  className="flex-1 px-6 py-3 bg-white/5 border border-white/20 text-white rounded-lg hover:bg-light-blue"
-                >
-                  Proceed to Payment
-                </button>
+                {((orderHistory.length > 0) ||
+                  (orderHistory.length === 0 &&
+                    currentTable &&
+                    Number(currentVenue?.pricingRules[currentTable.section]) <
+                      calculateSubtotal())) && (
+                  <button
+                    onClick={handleCheckout}
+                    className="flex-1 px-6 py-3 bg-white/5 border border-white/20 text-white rounded-lg hover:bg-light-blue"
+                  >
+                    Proceed to Payment
+                  </button>
+                )}
               </div>
             </>
           )}

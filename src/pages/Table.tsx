@@ -50,6 +50,7 @@ const Table: React.FC = () => {
         createOrder({
           venueId: currentVenue.id,
           tableId: currentTable.id,
+          userId: currentTable.userId,
           type: "regular",
         })
       ).unwrap();

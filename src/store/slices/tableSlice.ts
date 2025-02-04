@@ -28,7 +28,7 @@ export const getTablesByVenueId = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update table status"
+        error.response?.data?.error || "Failed to get tables"
       );
     }
   }
@@ -50,8 +50,9 @@ export const updateTableStatus = createAsyncThunk(
       console.log(response.data);
       return response.data;
     } catch (error: any) {
+      console.error(error);
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update table status"
+        error.response?.data?.error || "Table not available at the moment."
       );
     }
   }
@@ -65,7 +66,7 @@ export const getTableById = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update table status"
+        error.response?.data?.error || "Failed to get table"
       );
     }
   }
